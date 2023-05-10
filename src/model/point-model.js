@@ -1,7 +1,11 @@
-// import { generatePoint } from '../mock/points.js';
+export default class ModelPoint{
 
-// const POINT_COUNT = 3;
+  constructor(service){
+    this.service = service;
+    this.point = this.service.getPoints();
+  }
 
-// export default class NewPoints{
-//   points = Array.from({length: POINT_COUNT} );
-// }
+  get(){
+    return this.point;
+  }
+}

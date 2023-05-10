@@ -32,16 +32,17 @@ export default class CreatePointList {
   generateOffers(){
     return TYPES.map((type)=>({
       type,
-      offers: Array.from({length: getRandomInteger(0,TYPES.length)},() => createOffer(type))
-    }));
+      offers: Array.from({length: getRandomInteger(1,TYPES.length)},() => createOffer(type))
+    }
+    ));
   }
 
   generatePoints(){
-    return Array.from({length: getRandomInteger(0, TYPES.length)}, () => {
+    return Array.from({length: getRandomInteger(1, TYPES.length)}, () => {
       const type = getRandomValue(TYPES);
-      const offerId = this.offers.find((offerType) => offerType.type === type);
+      const offerElement = this.offers.find((offerType) => offerType.type === type);
       const destinationId = getRandomValue(this.destinations).id;
-      console.log(offerId.offers[0].id);
+      const offerId = offerElement.offers.map(({id})=> id);
       return createPoint(type, destinationId, offerId);
     }
     );
