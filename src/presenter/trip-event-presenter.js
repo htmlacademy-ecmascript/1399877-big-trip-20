@@ -7,13 +7,13 @@ export default class EventPresenter {
 
   eventComponent = new ListEvent();
 
-  constructor({listContainer}, pointModel, offerModel, destinationModel){
+  constructor({listContainer, pointsModel, offersModel, destinationsModel}){
     this.listContainer = listContainer;
-    this.point = pointModel;
-    this.offer = offerModel;
-    this.destination = destinationModel;
+    this.point = pointsModel;
+    this.offer = offersModel;
+    this.destination = destinationsModel;
 
-    this.points = pointModel.get();
+    this.points = pointsModel.get();
   }
 
   init(){

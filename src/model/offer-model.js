@@ -1,4 +1,4 @@
-export default class ModelOffer{
+export default class OfferModel{
   constructor(service){
     this.service = service;
     this.offer = this.service.getOffers();

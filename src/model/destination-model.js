@@ -1,4 +1,4 @@
-export default class ModelDestination{
+export default class DestinationsModel{
   constructor(service){
     this.service = service;
     this.destination = this.service.getDestinations();

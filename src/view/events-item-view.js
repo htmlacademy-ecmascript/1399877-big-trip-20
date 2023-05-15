@@ -4,11 +4,18 @@ import {formatStringToShortDate,formatStringShorTime, callcDate} from '../utils.
 
 function createEventsItemViewTemplate(data){
   const {point, pointDestination, pointOffers} = data;
+  const offersItemsList = pointOffers?.offers?.map((pointOffer) => `
+<li class="event__offer">
+        <span class="event__offer-title">${pointOffer.title}</span>
+        &plus;&euro;&nbsp;
+        <span class="event__offer-price">${pointOffer.price}</span>
+      </li>
+`).join('');
   return(`            <li class="trip-events__item">
   <div class="event">
     <time class="event__date" datetime="${point.dateFrom}">${formatStringToShortDate(point.dateFrom)}</time>
     <div class="event__type">
-      <img class="event__type-icon" width="42" height="42" src="img/icons/taxi.png" alt="Event type icon">
+    <img class="event__type-icon" width="42" height="42" src="img/icons/${point.type}.png" alt="Event type icon">
     </div>
     <h3 class="event__title">${point.type} ${pointDestination.name}</h3>
     <div class="event__schedule">
@@ -24,11 +31,7 @@ function createEventsItemViewTemplate(data){
     </p>
     <h4 class="visually-hidden">Offers:</h4>
     <ul class="event__selected-offers">
-      <li class="event__offer">
-        <span class="event__offer-title">Order Uber</span>
-        &plus;&euro;&nbsp;
-        <span class="event__offer-price">20</span>
-      </li>
+    ${offersItemsList}
     </ul>
     <button class="event__favorite-btn event__favorite-btn--active" type="button">
       <span class="visually-hidden">Add to favorite</span>

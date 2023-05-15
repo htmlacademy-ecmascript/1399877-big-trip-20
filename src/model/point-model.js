@@ -1,4 +1,4 @@
-export default class ModelPoint{
+export default class PointModel{
 
   constructor(service){
     this.service = service;
