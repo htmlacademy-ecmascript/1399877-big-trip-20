@@ -32,7 +32,7 @@ export default class CreatePointList {
   generateOffers(){
     return TYPES.map((type)=>({
       type,
-      offers: Array.from({length: getRandomInteger(1,TYPES.length)},() => createOffer(type))
+      offers: Array.from({length: getRandomInteger(0,3)},() => createOffer(type))
     }
     ));
   }

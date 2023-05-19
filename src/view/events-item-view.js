@@ -1,4 +1,4 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 import {formatStringToShortDate,formatStringShorTime, callcDate} from '../utils.js';
 
 
@@ -46,24 +46,15 @@ function createEventsItemViewTemplate(data){
 </li>`);
 }
 
-export default class EventsItemView {
+export default class EventsItemView extends AbstractView{
+  #data;
   constructor(data){
-    this.data = data;
+    super();
+    this.#data = data;
   }
 
-  getTemplate() {
-    return createEventsItemViewTemplate(this.data);
+  get template() {
+    return createEventsItemViewTemplate(this.#data);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
-  }
 }
