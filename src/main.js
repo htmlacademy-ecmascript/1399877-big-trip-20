@@ -14,16 +14,18 @@ const pointsModel = new PointModel(mockService);
 const offersModel = new OfferModel(mockService);
 const destinationsModel = new DestinationsModel(mockService);
 
-const pointPresentor = new PointPresentor({
+// const pointPresentor = new PointPresentor({
+//   listContainer: document.querySelector('.trip-events'),
+//   pointsModel: pointsModel,
+//   offersModel: offersModel,
+//   destinationsModel: destinationsModel
+// });
+
+const eventPresenter = new EventPresenter({
   listContainer: document.querySelector('.trip-events'),
   pointsModel: pointsModel,
   offersModel: offersModel,
   destinationsModel: destinationsModel
-});
-
-const eventPresenter = new EventPresenter({
-  listContainer: document.querySelector('.trip-events'),
-  pointPresentor: pointPresentor,
 });
 
 render(new InfoView(), document.querySelector('.trip-main'), RenderPosition.AFTERBEGIN);
