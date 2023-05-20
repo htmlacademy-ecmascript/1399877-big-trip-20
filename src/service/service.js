@@ -38,7 +38,7 @@ export default class CreatePointList {
   }
 
   generatePoints(){
-    return Array.from({length: getRandomInteger(1, TYPES.length)}, () => {
+    return Array.from({length: getRandomInteger(0, TYPES.length)}, () => {
       const type = getRandomValue(TYPES);
       const offerElement = this.offers.find((offerType) => offerType.type === type);
       const destinationId = getRandomValue(this.destinations).id;
