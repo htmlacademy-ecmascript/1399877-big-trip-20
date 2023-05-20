@@ -57,4 +57,7 @@ export default class EventsItemView extends AbstractView{
     return createEventsItemViewTemplate(this.#data);
   }
 
+  setEditHandler(cb){
+    this.element.querySelector('.event__rollup-btn').addEventListener('click',cb);
+  }
 }

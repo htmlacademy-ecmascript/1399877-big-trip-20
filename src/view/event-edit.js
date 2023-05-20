@@ -1,13 +1,20 @@
 import AbstractView from '../framework/view/abstract-view.js';
 
-function createItemEvent(){
+// рзобрать массив обьектов на масив из свойства name и после этого через map сделать темплейты
+// pointDestination?.map((element)=> `<option value="${element.name}"></option>`).join('');
+
+function createItemEvent(data){
+  const {point, pointDestination, pointOffers} = data;
+  const dataList = pointDestination.map((element)=>`<option value="${element.name}"></option>`).join('');
+  const destinationsItemsList = pointDestination?.map((element) => `<img class="event__photo" src="${element.picture[0].src}" alt="${element.picture[0].description}">`).join('');
+
   return (`            <li class="trip-events__item">
   <form class="event event--edit" action="#" method="post">
     <header class="event__header">
       <div class="event__type-wrapper">
         <label class="event__type  event__type-btn" for="event-type-toggle-1">
           <span class="visually-hidden">Choose event type</span>
-          <img class="event__type-icon" width="17" height="17" src="img/icons/bus.png" alt="Event type icon">
+          <img class="event__type-icon" width="17" height="17" src="img/icons/${point.type}.png" alt="Event type icon">
         </label>
         <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -65,13 +72,12 @@ function createItemEvent(){
 
       <div class="event__field-group  event__field-group--destination">
         <label class="event__label  event__type-output" for="event-destination-1">
-          Bus
+          ${point.type}
         </label>
-        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="Geneva" list="destination-list-1">
+        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value=""
+        list="destination-list-1">
         <datalist id="destination-list-1">
-          <option value="Amsterdam"></option>
-          <option value="Geneva"></option>
-          <option value="Chamonix"></option>
+        ${dataList}
         </datalist>
       </div>
 
@@ -88,7 +94,7 @@ function createItemEvent(){
           <span class="visually-hidden">Price</span>
           &euro;
         </label>
-        <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="">
+        <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${pointOffers[0].offers[0].price}">
       </div>
 
       <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -98,15 +104,11 @@ function createItemEvent(){
     <section class="event__details">
       <section class="event__section  event__section--destination">
         <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-        <p class="event__destination-description">Geneva is a city in Switzerland that lies at the southern tip of expansive Lac Léman (Lake Geneva). Surrounded by the Alps and Jura mountains, the city has views of dramatic Mont Blanc.</p>
+        <p class="event__destination-description">${point.type}</p>
 
         <div class="event__photos-container">
           <div class="event__photos-tape">
-            <img class="event__photo" src="img/photos/1.jpg" alt="Event photo">
-            <img class="event__photo" src="img/photos/2.jpg" alt="Event photo">
-            <img class="event__photo" src="img/photos/3.jpg" alt="Event photo">
-            <img class="event__photo" src="img/photos/4.jpg" alt="Event photo">
-            <img class="event__photo" src="img/photos/5.jpg" alt="Event photo">
+           ${destinationsItemsList}
           </div>
         </div>
       </section>
@@ -115,9 +117,18 @@ function createItemEvent(){
 </li>`);
 }
 
-export default class FormItemEvent extends AbstractView {
+export default class EventEdit extends AbstractView {
+  #data;
+  constructor(data){
+    super();
+    this.#data = data;
+  }
 
   get template() {
-    return createItemEvent();
+    return createItemEvent(this.#data);
+  }
+
+  setEditHandler(cb){
+    this.element.querySelector('.event__reset-btn').addEventListener('click',cb);
   }
 }
