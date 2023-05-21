@@ -59,7 +59,6 @@ export default class EventPresenter {
     if(this.#points.length > 0){
       render(this.#eventComponent,this.#listContainer);
       this.#points.forEach((point)=> {
-      // this.#renderEditPoint(point);
         this.#renderPoint(point);
       });
     }else {
