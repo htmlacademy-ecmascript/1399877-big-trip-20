@@ -31,8 +31,7 @@ function callcDate(dateFrom,dateTo){
   const from = dayjs(dateFrom);
   const to = dayjs(dateTo);
   const diff = to.diff(from,'hours', true);
-  const duration = dayjs.duration(diff, 'hours');
-  return duration.format('HH:mm');
+  return dayjs.duration(diff, 'hours').format('HH:mm');
 }
 
 export{getRandomInteger, getRandomValue,formatStringToDateTime,formatStringToShortDate, formatStringShorTime, callcDate};

@@ -58,6 +58,7 @@ function replace(newComponent, oldComponent) {
   }
 
   parent.replaceChild(newElement, oldElement);
+
 }
 
 /**

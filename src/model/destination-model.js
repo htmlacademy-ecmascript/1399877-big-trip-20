@@ -9,9 +9,9 @@ export default class DestinationsModel{
   }
 
   getById(idDestination){
-    return this.destination.find((id)=> {
-      if(idDestination === id.id){
-        return id;
+    return this.destination.find((element)=> {
+      if(idDestination === element.id){
+        return element;
       }
     });
   }
