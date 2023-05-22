@@ -1,11 +1,8 @@
-import { render, replace } from '../framework/render.js';
-import ListEvent from '../view/event-list-view.js';
-import EventsItemView from '../view/events-item-view.js';
-import EventEdit from '../view/event-edit.js';
+import { render } from '../framework/render.js';
 import ListEmpty from '../view/list-empty.js';
-export default class EventPresenter {
+import PointPresenter from './point-presenter.js';
 
-  #eventComponent = new ListEvent();
+export default class EventPresenter {
   #points = null;
   #listContainer = null;
   #point = null;
@@ -17,53 +14,40 @@ export default class EventPresenter {
     this.#point = pointsModel;
     this.#offer = offersModel;
     this.#destination = destinationsModel;
-    this.#points = pointsModel.get();
+    this.#points = new Map();
   }
 
-  #renderPoint = (point) => {
-    const pointComponent = new EventsItemView({
-      point,
-      pointDestination : this.#destination.getById(point.destination),
-      pointOffers: this.#offer.getByType(point.type)
-    });
-    // render(pointComponent,this.#eventComponent.element);
 
-    const pointEditComponent = new EventEdit({
-      point,
-      pointDestination : this.#destination.get(),
-      pointOffers: this.#offer.get()
+  #renderPoints(point){
+    const pointPresentor = new PointPresenter({
+      listContainer: this.#listContainer,
+      point: point,
+      offers: this.#offer,
+      destinations: this.#destination,
     });
 
-    const replacePointToEdit = () => {
-      replace(pointEditComponent, pointComponent);
-    };
-    const replaceEditToPoint = () => {
-      replace(pointComponent, pointEditComponent);
-    };
+    this.#points.set(point.id, pointPresentor);
+    pointPresentor.init();
 
-    pointComponent.setEditHandler(()=>replacePointToEdit());
-    pointEditComponent.setEditHandler(()=>replaceEditToPoint());
-    render(pointComponent,this.#eventComponent.element);
-  };
-
-  #renderEditPoint = (point) => {
-    const pointEditComponent = new EventEdit({
-      point,
-      pointDestination : this.#destination.get(),
-      pointOffers: this.#offer.get()
+    pointPresentor.onOpenEditMode(() => {
+      this.#points.forEach((pointId, presentor)=>{
+        if(point.id === pointId){
+          presentor.closeEditMode();
+        }
+      });
     });
-    render(pointEditComponent,this.#eventComponent.element);
-  };
+  }
 
   init(){
-    if(this.#points.length > 0){
-      render(this.#eventComponent,this.#listContainer);
-      this.#points.forEach((point)=> {
-        this.#renderPoint(point);
+    if(this.#point.get().length > 0){
+      this.#point.get().forEach((point)=> {
+        this.#renderPoints(point);
       });
+
     }else {
       render(new ListEmpty, this.#listContainer);
     }
+    console.log(this.#points);
   }
 }
 

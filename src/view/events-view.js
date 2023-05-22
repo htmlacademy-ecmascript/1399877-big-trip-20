@@ -46,11 +46,12 @@ function createEventsItemViewTemplate(data){
 </li>`);
 }
 
-export default class EventsItemView extends AbstractView{
-  #data;
+export default class EventsView extends AbstractView{
+  #data = null;
   constructor(data){
     super();
     this.#data = data;
+    this.element.querySelector('.event__rollup-btn');
   }
 
   get template() {
@@ -58,6 +59,7 @@ export default class EventsItemView extends AbstractView{
   }
 
   setEditHandler(cb){
-    this.element.querySelector('.event__rollup-btn').addEventListener('click',cb);
+    this.element.addEventListener('click',cb);
   }
 }
+
