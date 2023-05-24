@@ -65,5 +65,14 @@ export default class EventsView extends AbstractView{
       }
     });
   }
+
+  setFavoritHandler(cb){
+    this.element.addEventListener('click',(evt) => {
+      evt.preventDefault();
+      if(evt.target.closest('.event__favorite-icon')){
+        cb();
+      }
+    });
+  }
 }
 

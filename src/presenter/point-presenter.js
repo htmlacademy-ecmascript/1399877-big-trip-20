@@ -20,6 +20,9 @@ export default class PointPresenter{
   #openEditModeHandler = null;
 
   #mode = null;
+  #modeFavorit = null;
+  #openFavoritModeHandler = null;
+  #changeFavorite = null;
 
   constructor({eventsListView, point, offers, destinations}){
     this.#eventsListView = eventsListView;
@@ -27,6 +30,7 @@ export default class PointPresenter{
     this.#offer = offers;
     this.#destination = destinations;
     this.#mode = PointMode.VIEW;
+    this.#modeFavorit = this.#point.isFavorite;
   }
 
   #renderPoint = (point) => {
@@ -44,6 +48,9 @@ export default class PointPresenter{
 
     this.#pointEditComponent.setEditHandler(this.closeEditMode);
     this.#pointComponent.setEditHandler(this.openEditMode);
+
+    this.#pointComponent.setFavoritHandler(this.changeFavorite);
+
     render(this.#pointComponent,this.#eventsListView.element);
   };
 
@@ -76,6 +83,27 @@ export default class PointPresenter{
       this.#replaceEditToPoint();
     }
   };
+
+
+  setChangeFavoriteHandler = (cb) => {
+    this.#openFavoritModeHandler = cb;
+  };
+
+  setValueFavorite = () => {
+    this.#point.isFavorite = this.#modeFavorit;
+  };
+
+  changeFavorite = () => {
+    if(this.#modeFavorit === true){
+      this.#modeFavorit = false;
+      this.#openFavoritModeHandler();
+    }else{
+      this.#modeFavorit = true;
+      this.#openFavoritModeHandler();
+    }
+    // render(this.#pointComponent,this.#eventsListView.element);
+  };
+
 
   init(){
 

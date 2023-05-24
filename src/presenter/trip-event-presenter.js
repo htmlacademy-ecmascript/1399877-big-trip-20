@@ -38,18 +38,15 @@ export default class EventPresenter {
         }
       });
     });
+    this.#pointPresenter.setChangeFavoriteHandler(()=>{
+      this.#points.forEach((presentor,pointId) => {
+        if(point.id === pointId){
+          presentor.setValueFavorite();
+        }
+      });
+    });
     this.#points.set(point.id, this.#pointPresenter);
   }
-
-
-  // this.#pointPresenter.onCloseEditMode(() => {
-  //   console.log('closeEditMode');
-  //   this.#points.forEach((pointId, presentor)=>{
-  //     if(point.id === pointId){
-  //       presentor.onOpenEditMode();
-  //     }
-  //   });
-  // });
 
   init(){
     if(this.#point.get().length > 0){
