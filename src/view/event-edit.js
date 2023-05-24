@@ -129,6 +129,11 @@ export default class EventEdit extends AbstractView {
   }
 
   setEditHandler(cb){
-    this.element.querySelector('.event__reset-btn').addEventListener('click',cb);
+    this.element.addEventListener('click',(evt)=>{
+      evt.preventDefault();
+      if(evt.target.closest('.event__reset-btn')){
+        cb();
+      }
+    });
   }
 }

@@ -1,10 +1,15 @@
 import { render, replace } from '../framework/render.js';
-import ListEvent from '../view/event-list-view.js';
-import EventsView from '../view/events-view.js';
+import EventsView from '../view/event-view.js';
 import EventEdit from '../view/event-edit.js';
+
+const PointMode = {
+  VIEW: 'view',
+  EDIT: 'edit',
+};
+
 export default class PointPresenter{
-  #eventComponent = new ListEvent();
-  #listContainer = null;
+
+  #eventsListView = null;
   #point = null;
   #offer = null;
   #destination = null;
@@ -12,13 +17,16 @@ export default class PointPresenter{
 
   #pointComponent = null;
   #pointEditComponent = null;
-  #replacePointToEdit = null;
-  constructor({listContainer, point, offers, destinations}){
-    this.#listContainer = listContainer;
+  #openEditModeHandler = null;
+
+  #mode = null;
+
+  constructor({eventsListView, point, offers, destinations}){
+    this.#eventsListView = eventsListView;
     this.#point = point;
     this.#offer = offers;
     this.#destination = destinations;
-
+    this.#mode = PointMode.VIEW;
   }
 
   #renderPoint = (point) => {
@@ -27,30 +35,50 @@ export default class PointPresenter{
       pointDestination : this.#destination.getById(point.destination),
       pointOffers: this.#offer.getByType(point.type)
     });
+
     this.#pointEditComponent = new EventEdit({
       point,
       pointDestination : this.#destination.get(),
       pointOffers: this.#offer.get()
     });
 
-
-    const replaceEditToPoint = () => {
-      replace(this.#pointComponent, this.#pointEditComponent);
-    };
-
-    this.#pointEditComponent.setEditHandler(()=>replaceEditToPoint());
-    render(this.#pointComponent,this.#eventComponent.element);
+    this.#pointEditComponent.setEditHandler(this.closeEditMode);
+    this.#pointComponent.setEditHandler(this.openEditMode);
+    render(this.#pointComponent,this.#eventsListView.element);
   };
 
-  onOpenEditMode(){
-    this.#replacePointToEdit = () => {
-      replace(this.#pointEditComponent, this.#pointComponent);
-      this.#pointComponent.setEditHandler(()=>this.#replacePointToEdit());
-    };
-  }
+
+  #replacePointToEdit = () => {
+    this.#mode = PointMode.EDIT;
+    replace(this.#pointEditComponent, this.#pointComponent);
+
+  };
+
+  #replaceEditToPoint = () => {
+    this.#mode = PointMode.VIEW;
+    replace(this.#pointComponent, this.#pointEditComponent);
+  };
+
+  openEditMode = () =>{
+    if(this.#mode === PointMode.VIEW){
+      this.#replacePointToEdit();
+      this.#openEditModeHandler?.();
+    }
+  };
+
+  setOpenEditModeHandler = (cb) =>{
+    this.#openEditModeHandler = cb;
+
+  };
+
+  closeEditMode = () => {
+    if(this.#mode === PointMode.EDIT){
+      this.#replaceEditToPoint();
+    }
+  };
 
   init(){
-    render(this.#eventComponent,this.#listContainer);
+
     this.#renderPoint(this.#point);
   }
 }

@@ -51,7 +51,6 @@ export default class EventsView extends AbstractView{
   constructor(data){
     super();
     this.#data = data;
-    this.element.querySelector('.event__rollup-btn');
   }
 
   get template() {
@@ -59,7 +58,12 @@ export default class EventsView extends AbstractView{
   }
 
   setEditHandler(cb){
-    this.element.addEventListener('click',cb);
+    this.element.addEventListener('click',(evt)=>{
+      evt.preventDefault();
+      if(evt.target.closest('.event__rollup-btn')){
+        cb();
+      }
+    });
   }
 }
 

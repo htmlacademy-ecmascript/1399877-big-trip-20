@@ -1,13 +1,17 @@
 import { render } from '../framework/render.js';
 import ListEmpty from '../view/list-empty.js';
 import PointPresenter from './point-presenter.js';
+import EventsListView from '../view/events-list-view.js';
 
 export default class EventPresenter {
+  #eventsListView = new EventsListView();
   #points = null;
   #listContainer = null;
   #point = null;
   #offer = null;
   #destination = null;
+
+  #pointPresenter = null;
 
   constructor({listContainer, pointsModel, offersModel, destinationsModel}){
     this.#listContainer = listContainer;
@@ -18,36 +22,45 @@ export default class EventPresenter {
   }
 
 
-  #renderPoints(point){
-    const pointPresentor = new PointPresenter({
-      listContainer: this.#listContainer,
+  #renderPoint(point){
+    this.#pointPresenter = new PointPresenter({
+      eventsListView: this.#eventsListView,
       point: point,
       offers: this.#offer,
       destinations: this.#destination,
     });
+    this.#pointPresenter.init();
 
-    this.#points.set(point.id, pointPresentor);
-    pointPresentor.init();
-
-    pointPresentor.onOpenEditMode(() => {
-      this.#points.forEach((pointId, presentor)=>{
-        if(point.id === pointId){
+    this.#pointPresenter.setOpenEditModeHandler(() => {
+      this.#points.forEach((presentor,pointId)=>{
+        if(point.id !== pointId){
           presentor.closeEditMode();
         }
       });
     });
+    this.#points.set(point.id, this.#pointPresenter);
   }
+
+
+  // this.#pointPresenter.onCloseEditMode(() => {
+  //   console.log('closeEditMode');
+  //   this.#points.forEach((pointId, presentor)=>{
+  //     if(point.id === pointId){
+  //       presentor.onOpenEditMode();
+  //     }
+  //   });
+  // });
 
   init(){
     if(this.#point.get().length > 0){
+      render(this.#eventsListView,this.#listContainer);
       this.#point.get().forEach((point)=> {
-        this.#renderPoints(point);
+        this.#renderPoint(point);
       });
 
     }else {
       render(new ListEmpty, this.#listContainer);
     }
-    console.log(this.#points);
   }
 }
 
