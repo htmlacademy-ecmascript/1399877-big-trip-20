@@ -20,9 +20,10 @@ export default class PointPresenter{
   #openEditModeHandler = null;
 
   #mode = null;
-  #modeFavorit = null;
+  #modeFavorite = null;
   #openFavoritModeHandler = null;
   #changeFavorite = null;
+  #isFavorite = null;
 
   constructor({eventsListView, point, offers, destinations}){
     this.#eventsListView = eventsListView;
@@ -30,7 +31,7 @@ export default class PointPresenter{
     this.#offer = offers;
     this.#destination = destinations;
     this.#mode = PointMode.VIEW;
-    this.#modeFavorit = this.#point.isFavorite;
+    this.#modeFavorite = this.#point.isFavorite;
   }
 
   #renderPoint = (point) => {
@@ -39,7 +40,14 @@ export default class PointPresenter{
       pointDestination : this.#destination.getById(point.destination),
       pointOffers: this.#offer.getByType(point.type)
     });
-
+    this.#isFavorite = ()=>{
+      const element = this.#pointComponent.element.querySelector('.event__favorite-btn')
+      if(point.isFavorite){
+        element.classList.remove('.event__favorite-btn--active');
+      }else{
+        element.classList.add('.event__favorite-btn--active');
+      }
+    };
     this.#pointEditComponent = new EventEdit({
       point,
       pointDestination : this.#destination.get(),
@@ -49,8 +57,8 @@ export default class PointPresenter{
     this.#pointEditComponent.setEditHandler(this.closeEditMode);
     this.#pointComponent.setEditHandler(this.openEditMode);
 
-    this.#pointComponent.setFavoritHandler(this.changeFavorite);
-
+    this.#pointComponent.setFavoritHandler(this.  changeFavorite);
+    this.#isFavorite();
     render(this.#pointComponent,this.#eventsListView.element);
   };
 
@@ -90,15 +98,15 @@ export default class PointPresenter{
   };
 
   setValueFavorite = () => {
-    this.#point.isFavorite = this.#modeFavorit;
+    this.#point.isFavorite = this.#modeFavorite;
   };
 
   changeFavorite = () => {
-    if(this.#modeFavorit === true){
-      this.#modeFavorit = false;
+    if(this.#modeFavorite === true){
+      this.#modeFavorite = false;
       this.#openFavoritModeHandler();
     }else{
-      this.#modeFavorit = true;
+      this.#modeFavorite = true;
       this.#openFavoritModeHandler();
     }
     // render(this.#pointComponent,this.#eventsListView.element);

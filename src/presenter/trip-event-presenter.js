@@ -39,10 +39,9 @@ export default class EventPresenter {
       });
     });
     this.#pointPresenter.setChangeFavoriteHandler(()=>{
-      this.#points.forEach((presentor,pointId) => {
-        if(point.id === pointId){
-          presentor.setValueFavorite();
-        }
+      this.#points.forEach((presentor) => {
+        presentor.setValueFavorite();
+
       });
     });
     this.#points.set(point.id, this.#pointPresenter);
