@@ -2,59 +2,59 @@ import { render } from '../framework/render.js';
 import ListEmpty from '../view/list-empty.js';
 import PointPresenter from './point-presenter.js';
 import EventsListView from '../view/events-list-view.js';
-
 export default class EventPresenter {
   #eventsListView = new EventsListView();
-  #points = null;
   #listContainer = null;
-  #point = null;
-  #offer = null;
-  #destination = null;
-
+  /**
+	* Список всех презентеров точек
+	* @type {Map<string, PointPresenter>}
+	*/
+  #points = null;
+  #pointsModel = null;
+  #offersModel = null;
+  #destinationsModel = null;
   #pointPresenter = null;
 
   constructor({listContainer, pointsModel, offersModel, destinationsModel}){
     this.#listContainer = listContainer;
-    this.#point = pointsModel;
-    this.#offer = offersModel;
-    this.#destination = destinationsModel;
+    this.#pointsModel = pointsModel;
+    this.#offersModel = offersModel;
+    this.#destinationsModel = destinationsModel;
     this.#points = new Map();
   }
 
+  #handlePointChange = (updatedPoint) => {
+    this.#pointsModel.updatePoint(updatedPoint);
+    this.#points.get(updatedPoint.id)?.init(updatedPoint);
+  };
 
-  #renderPoint(point){
-    this.#pointPresenter = new PointPresenter({
+  #renderPoint(point) {
+    const pointPresenter = new PointPresenter({
       eventsListView: this.#eventsListView,
-      point: point,
-      offers: this.#offer,
-      destinations: this.#destination,
+      offersModel: this.#offersModel,
+      destinationsModel: this.#destinationsModel,
+      onDataChange: this.#handlePointChange
     });
-    this.#pointPresenter.init();
 
-    this.#pointPresenter.setOpenEditModeHandler(() => {
-      this.#points.forEach((presentor,pointId)=>{
-        if(point.id !== pointId){
-          presentor.closeEditMode();
+    pointPresenter.init(point);
+
+    pointPresenter.setOpenEditModeHandler(() => {
+      this.#points.forEach((presenter, pointId) => {
+        if (point.id !== pointId) {
+          presenter.closeEditMode();
         }
       });
     });
-    this.#pointPresenter.setChangeFavoriteHandler(()=>{
-      this.#points.forEach((presentor) => {
-        presentor.setValueFavorite();
 
-      });
-    });
-    this.#points.set(point.id, this.#pointPresenter);
+    this.#points.set(point.id, pointPresenter);
   }
 
-  init(){
-    if(this.#point.get().length > 0){
-      render(this.#eventsListView,this.#listContainer);
-      this.#point.get().forEach((point)=> {
-        this.#renderPoint(point);
-      });
-
-    }else {
+  init() {
+    const pointsData = this.#pointsModel.get();
+    if (pointsData.length) {
+      render(this.#eventsListView, this.#listContainer);
+      pointsData.forEach((point) => this.#renderPoint(point));
+    } else {
       render(new ListEmpty, this.#listContainer);
     }
   }

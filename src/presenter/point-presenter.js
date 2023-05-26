@@ -10,111 +10,109 @@ const PointMode = {
 export default class PointPresenter{
 
   #eventsListView = null;
-  #point = null;
-  #offer = null;
-  #destination = null;
-  #points = null;
-
-  #pointComponent = null;
+  #offersModel = null;
+  #destinationsModel = null;
+  #pointData = null;
+  #pointViewComponent = null;
   #pointEditComponent = null;
-  #openEditModeHandler = null;
-
+  #handleEditModeChange = null;
+  #handleDataChange = null;
   #mode = null;
   #modeFavorite = null;
   #openFavoritModeHandler = null;
   #changeFavorite = null;
-  #isFavorite = null;
 
-  constructor({eventsListView, point, offers, destinations}){
+
+  constructor({eventsListView, offersModel, destinationsModel, onDataChange}) {
     this.#eventsListView = eventsListView;
-    this.#point = point;
-    this.#offer = offers;
-    this.#destination = destinations;
-    this.#mode = PointMode.VIEW;
-    this.#modeFavorite = this.#point.isFavorite;
+    this.#offersModel = offersModel;
+    this.#destinationsModel = destinationsModel;
+    this.#handleDataChange = onDataChange;
   }
 
-  #renderPoint = (point) => {
-    this.#pointComponent = new EventsView({
+  #createViewModeComponent(point) {
+    const pointView = new EventsView({
       point,
-      pointDestination : this.#destination.getById(point.destination),
-      pointOffers: this.#offer.getByType(point.type)
-    });
-    this.#isFavorite = ()=>{
-      const element = this.#pointComponent.element.querySelector('.event__favorite-btn')
-      if(point.isFavorite){
-        element.classList.remove('.event__favorite-btn--active');
-      }else{
-        element.classList.add('.event__favorite-btn--active');
-      }
-    };
-    this.#pointEditComponent = new EventEdit({
-      point,
-      pointDestination : this.#destination.get(),
-      pointOffers: this.#offer.get()
+      pointDestination : this.#destinationsModel.getById(point.destination),
+      pointOffers : this.#offersModel.getByType(point.type),
     });
 
-    this.#pointEditComponent.setEditHandler(this.closeEditMode);
-    this.#pointComponent.setEditHandler(this.openEditMode);
+    pointView.setCancelHanlder(this.openEditMode);
+    pointView.setFavoriteHandler(this.changeFavorite);
 
-    this.#pointComponent.setFavoritHandler(this.  changeFavorite);
-    this.#isFavorite();
-    render(this.#pointComponent,this.#eventsListView.element);
-  };
+    return pointView;
+  }
 
+  #createEditModeComponent(point) {
+    const pointEdit = new EventEdit ({
+      point,
+      pointDestinations : this.#destinationsModel.get(),
+      pointOffers : this.#offersModel.get(),
+    });
 
-  #replacePointToEdit = () => {
+    pointEdit.setCancelHanlder(this.closeEditMode);
+
+    return pointEdit;
+  }
+
+  #renderOrReplace(view) {
+    const currentView = this.#mode === PointMode.VIEW ? this.#pointViewComponent : this.#pointEditComponent;
+    if (currentView) {
+      replace(view, currentView);
+    } else {
+      render(view, this.#eventsListView.element);
+    }
+  }
+
+  #renderEditMode() {
+    const view = this.#createEditModeComponent(this.#pointData);
+    this.#renderOrReplace(view);
+    this.#pointEditComponent = view;
     this.#mode = PointMode.EDIT;
-    replace(this.#pointEditComponent, this.#pointComponent);
+  }
 
-  };
+  #renderViewMode() {
+    const view = this.#createViewModeComponent(this.#pointData);
+    console.log(view)
+    this.#renderOrReplace(view);
 
-  #replaceEditToPoint = () => {
+    this.#pointViewComponent = view;
     this.#mode = PointMode.VIEW;
-    replace(this.#pointComponent, this.#pointEditComponent);
-  };
+  }
+
 
   openEditMode = () =>{
     if(this.#mode === PointMode.VIEW){
-      this.#replacePointToEdit();
-      this.#openEditModeHandler?.();
+      this.#renderEditMode();
+      this.#handleEditModeChange?.();
     }
   };
 
   setOpenEditModeHandler = (cb) =>{
-    this.#openEditModeHandler = cb;
-
+    this.#handleEditModeChange = cb;
   };
 
   closeEditMode = () => {
     if(this.#mode === PointMode.EDIT){
-      this.#replaceEditToPoint();
+      this.#renderViewMode();
     }
-  };
-
-
-  setChangeFavoriteHandler = (cb) => {
-    this.#openFavoritModeHandler = cb;
-  };
-
-  setValueFavorite = () => {
-    this.#point.isFavorite = this.#modeFavorite;
   };
 
   changeFavorite = () => {
-    if(this.#modeFavorite === true){
-      this.#modeFavorite = false;
-      this.#openFavoritModeHandler();
-    }else{
-      this.#modeFavorite = true;
-      this.#openFavoritModeHandler();
-    }
-    // render(this.#pointComponent,this.#eventsListView.element);
+    this.#handleDataChange({
+      ...this.#pointData,
+      isFavorite: !this.#pointData.isFavorite
+    });
   };
 
+  init(pointData) {
+    this.#pointData = pointData;
 
-  init(){
-
-    this.#renderPoint(this.#point);
+    if (this.#mode === PointMode.VIEW) {
+      this.#renderViewMode();
+    } else {
+      this.#renderEditMode();
+    }
   }
+
 }

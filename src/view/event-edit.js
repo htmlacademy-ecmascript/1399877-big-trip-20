@@ -1,12 +1,9 @@
 import AbstractView from '../framework/view/abstract-view.js';
 
-// рзобрать массив обьектов на масив из свойства name и после этого через map сделать темплейты
-// pointDestination?.map((element)=> `<option value="${element.name}"></option>`).join('');
-
 function createItemEvent(data){
-  const {point, pointDestination, pointOffers} = data;
-  const dataList = pointDestination.map((element)=>`<option value="${element.name}"></option>`).join('');
-  const destinationsItemsList = pointDestination?.map((element) => `<img class="event__photo" src="${element.picture[0].src}" alt="${element.picture[0].description}">`).join('');
+  const {point, pointDestinations, pointOffers} = data;
+  const dataList = pointDestinations.map((element)=>`<option value="${element.name}"></option>`).join('');
+  const destinationsItemsList = pointDestinations?.map((element) => `<img class="event__photo" src="${element.picture[0].src}" alt="${element.picture[0].description}">`).join('');
 
   return (`            <li class="trip-events__item">
   <form class="event event--edit" action="#" method="post">
@@ -128,7 +125,7 @@ export default class EventEdit extends AbstractView {
     return createItemEvent(this.#data);
   }
 
-  setEditHandler(cb){
+  setCancelHanlder(cb){
     this.element.addEventListener('click',(evt)=>{
       evt.preventDefault();
       if(evt.target.closest('.event__reset-btn')){
