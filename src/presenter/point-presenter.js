@@ -17,7 +17,7 @@ export default class PointPresenter{
   #pointEditComponent = null;
   #handleEditModeChange = null;
   #handleDataChange = null;
-  #mode = null;
+  #mode = PointMode.VIEW;
   #modeFavorite = null;
   #openFavoritModeHandler = null;
   #changeFavorite = null;
@@ -37,7 +37,7 @@ export default class PointPresenter{
       pointOffers : this.#offersModel.getByType(point.type),
     });
 
-    pointView.setCancelHanlder(this.openEditMode);
+    pointView.setEditHandler(this.openEditMode);
     pointView.setFavoriteHandler(this.changeFavorite);
 
     return pointView;
@@ -73,7 +73,6 @@ export default class PointPresenter{
 
   #renderViewMode() {
     const view = this.#createViewModeComponent(this.#pointData);
-    console.log(view)
     this.#renderOrReplace(view);
 
     this.#pointViewComponent = view;
@@ -107,7 +106,6 @@ export default class PointPresenter{
 
   init(pointData) {
     this.#pointData = pointData;
-
     if (this.#mode === PointMode.VIEW) {
       this.#renderViewMode();
     } else {
