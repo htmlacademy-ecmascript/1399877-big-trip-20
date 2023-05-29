@@ -8,4 +8,12 @@ export default class PointModel{
   get(){
     return this.point;
   }
+
+  updatePoint(updatedPoint) {
+    this.point.find((point) => {
+      if(point.id === updatedPoint.id) {
+        Object.assign(point, updatedPoint);
+      }
+    });
+  }
 }

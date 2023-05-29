@@ -1,68 +1,60 @@
-import { render, replace } from '../framework/render.js';
-import ListEvent from '../view/event-list-view.js';
-import EventsItemView from '../view/events-item-view.js';
-import EventEdit from '../view/event-edit.js';
+import { render } from '../framework/render.js';
 import ListEmpty from '../view/list-empty.js';
+import PointPresenter from './point-presenter.js';
+import EventsListView from '../view/events-list-view.js';
 export default class EventPresenter {
-
-  #eventComponent = new ListEvent();
-  #points = null;
+  #eventsListView = new EventsListView();
   #listContainer = null;
-  #point = null;
-  #offer = null;
-  #destination = null;
+  /**
+	* Список всех презентеров точек
+	* @type {Map<string, PointPresenter>}
+	*/
+  #points = null;
+  #pointsModel = null;
+  #offersModel = null;
+  #destinationsModel = null;
+  #pointPresenter = null;
 
   constructor({listContainer, pointsModel, offersModel, destinationsModel}){
     this.#listContainer = listContainer;
-    this.#point = pointsModel;
-    this.#offer = offersModel;
-    this.#destination = destinationsModel;
-    this.#points = pointsModel.get();
+    this.#pointsModel = pointsModel;
+    this.#offersModel = offersModel;
+    this.#destinationsModel = destinationsModel;
+    this.#points = new Map();
   }
 
-  #renderPoint = (point) => {
-    const pointComponent = new EventsItemView({
-      point,
-      pointDestination : this.#destination.getById(point.destination),
-      pointOffers: this.#offer.getByType(point.type)
-    });
-    // render(pointComponent,this.#eventComponent.element);
-
-    const pointEditComponent = new EventEdit({
-      point,
-      pointDestination : this.#destination.get(),
-      pointOffers: this.#offer.get()
-    });
-
-    const replacePointToEdit = () => {
-      replace(pointEditComponent, pointComponent);
-    };
-    const replaceEditToPoint = () => {
-      replace(pointComponent, pointEditComponent);
-    };
-
-    pointComponent.setEditHandler(()=>replacePointToEdit());
-    pointEditComponent.setEditHandler(()=>replaceEditToPoint());
-    render(pointComponent,this.#eventComponent.element);
+  #handlePointChange = (updatedPoint) => {
+    this.#pointsModel.updatePoint(updatedPoint);
+    this.#points.get(updatedPoint.id)?.init(updatedPoint);
   };
 
-  #renderEditPoint = (point) => {
-    const pointEditComponent = new EventEdit({
-      point,
-      pointDestination : this.#destination.get(),
-      pointOffers: this.#offer.get()
+  #renderPoint(point) {
+    const pointPresenter = new PointPresenter({
+      eventsListView: this.#eventsListView,
+      offersModel: this.#offersModel,
+      destinationsModel: this.#destinationsModel,
+      onDataChange: this.#handlePointChange
     });
-    render(pointEditComponent,this.#eventComponent.element);
-  };
 
-  init(){
-    if(this.#points.length > 0){
-      render(this.#eventComponent,this.#listContainer);
-      this.#points.forEach((point)=> {
-      // this.#renderEditPoint(point);
-        this.#renderPoint(point);
+    pointPresenter.init(point);
+
+    pointPresenter.setOpenEditModeHandler(() => {
+      this.#points.forEach((presenter, pointId) => {
+        if (point.id !== pointId) {
+          presenter.closeEditMode();
+        }
       });
-    }else {
+    });
+
+    this.#points.set(point.id, pointPresenter);
+  }
+
+  init() {
+    const pointsData = this.#pointsModel.get();
+    if (pointsData.length) {
+      render(this.#eventsListView, this.#listContainer);
+      pointsData.forEach((point) => this.#renderPoint(point));
+    } else {
       render(new ListEmpty, this.#listContainer);
     }
   }
