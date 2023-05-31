@@ -27,7 +27,7 @@ function createEventsItemViewTemplate(data){
       <p class="event__duration">${callcDate(point.dateFrom ,point.dateTo)}</p>
     </div>
     <p class="event__price">
-      &euro;&nbsp;<span class="event__price-value">${pointOffers.offers[0].price}</span>
+      &euro;&nbsp;<span class="event__price-value">${point.basePrice}</span>
     </p>
     <h4 class="visually-hidden">Offers:</h4>
     <ul class="event__selected-offers">
