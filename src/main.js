@@ -1,19 +1,17 @@
 import {render, RenderPosition} from './framework/render.js';
 import InfoView from './view/main-info-view.js';
-import TripFilter from './view/trip-filters.js';
-import FormSort from './view/sort-main.js';
 import EventPresenter from './presenter/trip-event-presenter.js';
 import CreatePointList from './service/service.js';
 import PointModel from './model/point-model.js';
 import OfferModel from './model/offer-model.js';
 import DestinationsModel from './model/destination-model.js';
-
+import FilterPresenter from './presenter/filter-presenter.js';
 
 const mockService = new CreatePointList();
 const pointsModel = new PointModel(mockService);
 const offersModel = new OfferModel(mockService);
 const destinationsModel = new DestinationsModel(mockService);
-
+const filterPresenter = new FilterPresenter(pointsModel, document.querySelector('.trip-main'));
 
 const eventPresenter = new EventPresenter({
   listContainer: document.querySelector('.trip-events'),
@@ -23,9 +21,8 @@ const eventPresenter = new EventPresenter({
 });
 
 render(new InfoView(), document.querySelector('.trip-main'), RenderPosition.AFTERBEGIN);
-render (new TripFilter(), document.querySelector('.trip-main'));
-render(new FormSort(),document.querySelector('.trip-events'));
 
+filterPresenter.init();
 eventPresenter.init();
 
 

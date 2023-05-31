@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import {formatStringToShortDate,formatStringShorTime, callcDate} from '../utils.js';
+import {formatStringToShortDate,formatStringShorTime, callcDate} from '../utils/point.js';
 
 
 function createEventsItemViewTemplate(data){
@@ -61,6 +61,15 @@ export default class EventsView extends AbstractView{
     this.element.addEventListener('click',(evt)=>{
       evt.preventDefault();
       if(evt.target.closest('.event__rollup-btn')){
+        cb();
+      }
+    });
+  }
+
+  setEditHandlerKey(cb){
+    this.element.addEventListener('keydown',(evt)=>{
+      evt.preventDefault();
+      if(evt.target.key === 'ArrowUp'){
         cb();
       }
     });

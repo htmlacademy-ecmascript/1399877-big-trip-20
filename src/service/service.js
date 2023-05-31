@@ -1,7 +1,7 @@
 import { createPoint } from '../mock/points.js';
 import {createDestination} from '../mock/destination.js';
 import {createOffer} from '../mock/offers.js';
-import {getRandomValue, getRandomInteger} from '../../src/utils.js';
+import {getRandomValue, getRandomInteger} from '../utils/point.js';
 import { TYPES } from '../const.js';
 
 

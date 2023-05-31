@@ -1,7 +1,10 @@
 import { render } from '../framework/render.js';
 import ListEmpty from '../view/list-empty.js';
 import PointPresenter from './point-presenter.js';
+import SortPresenter from './sort-presenter.js';
 import EventsListView from '../view/events-list-view.js';
+
+
 export default class EventPresenter {
   #eventsListView = new EventsListView();
   #listContainer = null;
@@ -9,7 +12,7 @@ export default class EventPresenter {
 	* Список всех презентеров точек
 	* @type {Map<string, PointPresenter>}
 	*/
-  #points = null;
+  #pointPresenters = new Map();
   #pointsModel = null;
   #offersModel = null;
   #destinationsModel = null;
@@ -20,12 +23,11 @@ export default class EventPresenter {
     this.#pointsModel = pointsModel;
     this.#offersModel = offersModel;
     this.#destinationsModel = destinationsModel;
-    this.#points = new Map();
   }
 
   #handlePointChange = (updatedPoint) => {
     this.#pointsModel.updatePoint(updatedPoint);
-    this.#points.get(updatedPoint.id)?.init(updatedPoint);
+    this.#pointPresenters.get(updatedPoint.id)?.init(updatedPoint);
   };
 
   #renderPoint(point) {
@@ -33,25 +35,37 @@ export default class EventPresenter {
       eventsListView: this.#eventsListView,
       offersModel: this.#offersModel,
       destinationsModel: this.#destinationsModel,
-      onDataChange: this.#handlePointChange
+      onDataChange: this.#handlePointChange,
     });
 
     pointPresenter.init(point);
 
     pointPresenter.setOpenEditModeHandler(() => {
-      this.#points.forEach((presenter, pointId) => {
+      this.#pointPresenters.forEach((presenter, pointId) => {
         if (point.id !== pointId) {
           presenter.closeEditMode();
         }
       });
     });
 
-    this.#points.set(point.id, pointPresenter);
+    this.#pointPresenters.set(point.id, pointPresenter);
+
+    document.addEventListener('keydown', pointPresenter.escKeyDownHandler);
+  }
+
+  #sortPoints() {
+    const sortPresentor = new SortPresenter(
+      {
+        listContainer:this.#listContainer,
+        pointsModel: this.#pointsModel
+      });
+    sortPresentor.init();
   }
 
   init() {
     const pointsData = this.#pointsModel.get();
     if (pointsData.length) {
+      this.#sortPoints();
       render(this.#eventsListView, this.#listContainer);
       pointsData.forEach((point) => this.#renderPoint(point));
     } else {
