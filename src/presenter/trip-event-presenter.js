@@ -1,10 +1,8 @@
-import { render } from '../framework/render.js';
+import { render} from '../framework/render.js';
 import ListEmpty from '../view/list-empty.js';
 import PointPresenter from './point-presenter.js';
 import SortPresenter from './sort-presenter.js';
 import EventsListView from '../view/events-list-view.js';
-import {sort} from '../utils/sort.js';
-import { SortType } from '../const.js';
 
 export default class EventPresenter {
   #eventsListView = new EventsListView();
@@ -19,6 +17,7 @@ export default class EventPresenter {
   #destinationsModel = null;
   #pointPresenter = null;
   #points = null;
+  #sortPresenter = null;
 
   constructor({listContainer, pointsModel, offersModel, destinationsModel}){
     this.#listContainer = listContainer;
@@ -26,8 +25,17 @@ export default class EventPresenter {
     this.#offersModel = offersModel;
     this.#destinationsModel = destinationsModel;
 
-    this.#points = sort[SortType.DAY]([...pointsModel.get()]);
+    this.#sortPresenter = new SortPresenter({
+      listContainer,
+      onSortChange: this.#handeSortChange
+    });
   }
+
+  #handeSortChange = () => {
+    this.#sortPresenter.destroy();
+    this.#clearPoits();
+    this.init();
+  };
 
   #handlePointChange = (updatedPoint) => {
     this.#pointsModel.updatePoint(updatedPoint);
@@ -35,16 +43,16 @@ export default class EventPresenter {
   };
 
   #renderPoint(point) {
-    const pointPresenter = new PointPresenter({
+    this.#pointPresenter = new PointPresenter({
       eventsListView: this.#eventsListView,
       offersModel: this.#offersModel,
       destinationsModel: this.#destinationsModel,
       onDataChange: this.#handlePointChange,
     });
 
-    pointPresenter.init(point);
+    this.#pointPresenter.init(point);
 
-    pointPresenter.setOpenEditModeHandler(() => {
+    this.#pointPresenter.setOpenEditModeHandler(() => {
       this.#pointPresenters.forEach((presenter, pointId) => {
         if (point.id !== pointId) {
           presenter.closeEditMode();
@@ -52,26 +60,29 @@ export default class EventPresenter {
       });
     });
 
-    this.#pointPresenters.set(point.id, pointPresenter);
+    this.#pointPresenters.set(point.id, this.#pointPresenter);
 
-    document.addEventListener('keydown', pointPresenter.escKeyDownHandler);
+    document.addEventListener('keydown', this.#pointPresenter.escKeyDownHandler);
   }
 
-  #sortPoints() {
-    const sortPresentor = new SortPresenter(
-      {
-        listContainer:this.#listContainer,
-        points: this.#points
-      });
-    sortPresentor.init();
-  }
+  #clearPoits = () => {
+    this.#pointPresenters.forEach((presenter) => {
+      presenter.destroy();
+    });
+    // this.#sortPresenter.destroy();
+    this.#pointPresenters.clear();
+
+    // this.#eventsListView.removeElement();
+  };
 
   init() {
-    const pointsData = this.#points;
+    const pointsData = [...this.#pointsModel.get()];
+    this.#clearPoits();
     if (pointsData.length) {
-      this.#sortPoints();
+      const sortedPoints = this.#sortPresenter.sortPoints(pointsData);
+      this.#sortPresenter.init();
       render(this.#eventsListView, this.#listContainer);
-      pointsData.forEach((point) => this.#renderPoint(point));
+      sortedPoints.forEach((point) => this.#renderPoint(point));
     } else {
       render(new ListEmpty, this.#listContainer);
     }

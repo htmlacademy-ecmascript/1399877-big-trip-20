@@ -17,7 +17,7 @@ const eventPresenter = new EventPresenter({
   listContainer: document.querySelector('.trip-events'),
   pointsModel: pointsModel,
   offersModel: offersModel,
-  destinationsModel: destinationsModel
+  destinationsModel: destinationsModel,
 });
 
 render(new InfoView(), document.querySelector('.trip-main'), RenderPosition.AFTERBEGIN);

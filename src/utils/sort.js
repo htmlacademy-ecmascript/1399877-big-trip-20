@@ -3,9 +3,9 @@ import { SortType } from '../const.js';
 
 
 const sort = {
-  [SortType.DAY] : (points) => points.slice().filter(() => getPointsDateDifference),
-  [SortType.PRICE] : (points) => points.slice().filter(() => getPointsPriceDateDifference),
-  [SortType.TIME] : (points) => points.slice().filter(() => getPointsDurationDateDifference),
+  [SortType.DAY] : (points) => points.sort(getPointsDateDifference),
+  [SortType.PRICE] : (points) => points.sort(getPointsPriceDateDifference),
+  [SortType.TIME] : (points) => points.sort(getPointsDurationDateDifference),
   [SortType.EVENT] : () => {
     throw new Error(`Sort by ${SortType.EVENT} is not implemented`);
   },
