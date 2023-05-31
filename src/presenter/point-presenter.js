@@ -1,4 +1,4 @@
-import { render, replace } from '../framework/render.js';
+import { render, replace, remove } from '../framework/render.js';
 import EventsView from '../view/event-view.js';
 import EventEdit from '../view/event-edit.js';
 
@@ -18,9 +18,7 @@ export default class PointPresenter{
   #handleEditModeChange = null;
   #handleDataChange = null;
   #mode = PointMode.VIEW;
-  #modeFavorite = null;
-  #openFavoritModeHandler = null;
-  #changeFavorite = null;
+  #view = null;
 
 
   constructor({eventsListView, offersModel, destinationsModel, onDataChange}) {
@@ -38,6 +36,7 @@ export default class PointPresenter{
     });
 
     pointView.setEditHandler(this.openEditMode);
+    pointView.setEditHandlerKey(this.openEditMode);
     pointView.setFavoriteHandler(this.changeFavorite);
 
     return pointView;
@@ -51,7 +50,6 @@ export default class PointPresenter{
     });
 
     pointEdit.setCancelHanlder(this.closeEditMode);
-
     return pointEdit;
   }
 
@@ -72,10 +70,10 @@ export default class PointPresenter{
   }
 
   #renderViewMode() {
-    const view = this.#createViewModeComponent(this.#pointData);
-    this.#renderOrReplace(view);
+    this.#view = this.#createViewModeComponent(this.#pointData);
+    this.#renderOrReplace(this.#view);
 
-    this.#pointViewComponent = view;
+    this.#pointViewComponent = this.#view;
     this.#mode = PointMode.VIEW;
   }
 
@@ -97,12 +95,24 @@ export default class PointPresenter{
     }
   };
 
+  escKeyDownHandler = (evt) => {
+    if(evt.key === 'Escape'){
+      evt.preventDefault();
+      this.closeEditMode();
+      document.removeEventListener('keydown', this.escKeyDownHandler);
+    }
+  };
+
   changeFavorite = () => {
     this.#handleDataChange({
       ...this.#pointData,
       isFavorite: !this.#pointData.isFavorite
     });
   };
+
+  destroy(){
+    remove(this.#view);
+  }
 
   init(pointData) {
     this.#pointData = pointData;

@@ -1,4 +1,4 @@
-import { getRandomValue} from '../utils.js';
+import { getRandomValue} from '../utils/point.js';
 import {CITIES, DESCRIPTION} from './const.js';
 
 function createDestination(){

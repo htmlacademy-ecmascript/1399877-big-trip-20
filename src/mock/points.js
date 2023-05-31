@@ -1,5 +1,5 @@
 import { Price} from './const.js';
-import { getRandomInteger,formatStringToDateTime } from '../utils.js';
+import { getRandomInteger,formatStringToDateTime } from '../utils/point.js';
 import { getDate } from './utils.js';
 
 function createPoint(type, desinationId, OfferId){
