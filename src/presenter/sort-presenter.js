@@ -1,6 +1,5 @@
 import SortView from '../view/sort-view.js';
 import {render, RenderPosition} from '../framework/render.js';
-import {sort} from '../utils/sort.js';
 import { SortType } from '../const.js';
 
 
@@ -9,14 +8,15 @@ export default class SortPresenter{
   #pointsModel = null;
   #currentSortType = null;
   #sortView = null;
+  #points = null;
 
-  constructor({listContainer, pointsModel}){
+  constructor({listContainer, points}){
     this.#listContainer = listContainer;
-    this.#pointsModel = pointsModel;
+    this.#points = points;
   }
 
   #onsortTypeChange = (sortType) => {
-    console.log(sort[sortType]);
+    console.log(1);
   };
 
   #sortRender(){
@@ -29,5 +29,6 @@ export default class SortPresenter{
 
   init(){
     this.#sortRender();
+    console.log(1);
   }
 }

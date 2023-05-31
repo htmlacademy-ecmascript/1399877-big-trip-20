@@ -4,20 +4,21 @@ import { enabledSortType } from '../const.js';
 function getSortItem(sortItem) {
   return `
   <div class="trip-sort__item  trip-sort__item--${sortItem.type}">
-    <input
-    id="sort-${sortItem.type}"
-    class="trip-sort__input
-    visually-hidden"
-    type="radio"
-    name="trip-sort"
-    value="sort-${sortItem.type}"
-    data-sort-type="${sortItem.type}"
-    ${(sortItem.isChecked) ? 'checked' : ''}
-    ${(sortItem.isDisabled) ? 'disabled' : ''}
+    <input id="sort-${sortItem.type}"
+     class="trip-sort__input
+     visually-hidden"
+     type="radio"
+     name="trip-sort"
+     value="sort-${sortItem.type}"
+     data-sort-type="${sortItem.type}"
+     ${(sortItem.isChecked) ? 'checked' : ''}
+     ${(sortItem.isDisabled) ? 'disabled' : ''}
   >
   <label
     class="trip-sort__btn"
-    for="sort-${sortItem.type}></label>
+    for="sort-${sortItem.type}">
+    ${sortItem.type}
+  </label>
 </div>`;
 }
 
@@ -31,7 +32,7 @@ export default class SortView extends AbstractView{
 
   #sortMap = null;
   #onsortTypeChange = null;
-
+  #SortType = null;
   constructor({onsortTypeChange, SortType}){
     super();
 
@@ -43,7 +44,7 @@ export default class SortView extends AbstractView{
       }));
 
     this.#onsortTypeChange = onsortTypeChange;
-
+    this.#SortType = SortType;
     this.element.addEventListener('click', this.#sortTypeChangeHandler);
 
   }
@@ -53,7 +54,10 @@ export default class SortView extends AbstractView{
   }
 
   #sortTypeChangeHandler = (evt) => {
-    evt.preventDefault();
-    this.#onsortTypeChange(evt.target);
+    if(evt.target.closest('.trip-sort__input')){
+      evt.preventDefault();
+      this.#onsortTypeChange(evt.target.dataset['sortType']);
+      console.log(this.#SortType)
+    }
   };
 }

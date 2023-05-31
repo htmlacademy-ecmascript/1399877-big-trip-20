@@ -3,7 +3,8 @@ import ListEmpty from '../view/list-empty.js';
 import PointPresenter from './point-presenter.js';
 import SortPresenter from './sort-presenter.js';
 import EventsListView from '../view/events-list-view.js';
-
+import {sort} from '../utils/sort.js';
+import { SortType } from '../const.js';
 
 export default class EventPresenter {
   #eventsListView = new EventsListView();
@@ -17,12 +18,15 @@ export default class EventPresenter {
   #offersModel = null;
   #destinationsModel = null;
   #pointPresenter = null;
+  #points = null;
 
   constructor({listContainer, pointsModel, offersModel, destinationsModel}){
     this.#listContainer = listContainer;
     this.#pointsModel = pointsModel;
     this.#offersModel = offersModel;
     this.#destinationsModel = destinationsModel;
+
+    this.#points = sort[SortType.DAY]([...pointsModel.get()]);
   }
 
   #handlePointChange = (updatedPoint) => {
@@ -57,13 +61,13 @@ export default class EventPresenter {
     const sortPresentor = new SortPresenter(
       {
         listContainer:this.#listContainer,
-        pointsModel: this.#pointsModel
+        points: this.#points
       });
     sortPresentor.init();
   }
 
   init() {
-    const pointsData = this.#pointsModel.get();
+    const pointsData = this.#points;
     if (pointsData.length) {
       this.#sortPoints();
       render(this.#eventsListView, this.#listContainer);
