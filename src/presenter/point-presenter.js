@@ -44,8 +44,8 @@ export default class PointPresenter{
   #createEditModeComponent(point) {
     const pointEdit = new EventEdit ({
       point,
-      pointDestinations : this.#destinationsModel.get(),
-      pointOffers : this.#offersModel.get(),
+      destinationsModel : this.#destinationsModel,
+      offersModel : this.#offersModel,
     });
 
     pointEdit.setCancelHanlder(this.closeEditMode);

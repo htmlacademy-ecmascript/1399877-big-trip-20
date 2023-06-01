@@ -1,4 +1,4 @@
-import AbstractView from '../framework/view/abstract-view.js';
+import AbstractStatefulView from '../framework/view/abstract-view.js';
 
 function createItemEvent(data){
   const {point, pointDestinations, pointOffers} = data;
@@ -114,15 +114,19 @@ function createItemEvent(data){
 </li>`);
 }
 
-export default class EventEdit extends AbstractView {
-  #data;
-  constructor(data){
+
+export default class EventEdit extends AbstractStatefulView {
+  #destinationsModel = null;
+  #offersModel = null;
+  constructor({point, destinationsModel, offersModel}){
     super();
-    this.#data = data;
+    this.#destinationsModel = destinationsModel;
+    this.#offersModel = offersModel;
+    this._setState(EventEdit.parsePointToState({point}));
   }
 
   get template() {
-    return createItemEvent(this.#data);
+    return createItemEvent(this._state);
   }
 
   setCancelHanlder(cb){
@@ -130,8 +134,13 @@ export default class EventEdit extends AbstractView {
       evt.preventDefault();
       if(evt.target.closest('.event__reset-btn')){
         cb();
+        console.log(EventEdit.parsePointToState({point}));
       }
     });
   }
+
+  static parsePointToState = ({point}) => ({point});
+
+  static parseStateToPoint = (state) => state.point;
 }
 
