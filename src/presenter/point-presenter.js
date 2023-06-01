@@ -18,7 +18,6 @@ export default class PointPresenter{
   #handleEditModeChange = null;
   #handleDataChange = null;
   #mode = PointMode.VIEW;
-  #view = null;
 
 
   constructor({eventsListView, offersModel, destinationsModel, onDataChange}) {
@@ -70,10 +69,10 @@ export default class PointPresenter{
   }
 
   #renderViewMode() {
-    this.#view = this.#createViewModeComponent(this.#pointData);
-    this.#renderOrReplace(this.#view);
+    const view = this.#createViewModeComponent(this.#pointData);
+    this.#renderOrReplace(view);
 
-    this.#pointViewComponent = this.#view;
+    this.#pointViewComponent = view;
     this.#mode = PointMode.VIEW;
   }
 
@@ -111,7 +110,8 @@ export default class PointPresenter{
   };
 
   destroy(){
-    remove(this.#view);
+    remove(this.#pointEditComponent);
+    remove(this.#pointViewComponent);
   }
 
   init(pointData) {
