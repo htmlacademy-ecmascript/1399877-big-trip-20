@@ -16,4 +16,12 @@ export default class DestinationsModel{
     });
   }
 
+  updateDestination(updatedDestination) {
+    this.destination.find((destination) => {
+      if(destination.id === updatedDestination.id) {
+        Object.assign(destination, updatedDestination);
+      }
+    });
+  }
+
 }

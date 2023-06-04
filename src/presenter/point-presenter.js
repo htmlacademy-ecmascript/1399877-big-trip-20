@@ -46,6 +46,7 @@ export default class PointPresenter{
       point,
       destinationsModel : this.#destinationsModel,
       offersModel : this.#offersModel,
+      onhandlerPoint : this.#handlerPointSubmit
     });
 
     pointEdit.setCancelHanlder(this.closeEditMode);
@@ -109,10 +110,20 @@ export default class PointPresenter{
     });
   };
 
+  changeUpdate = () =>{
+    this.#handleDataChange(...this.#pointData);
+  };
+
   destroy(){
     remove(this.#pointEditComponent);
     remove(this.#pointViewComponent);
   }
+
+  #handlerPointSubmit = (point) => {
+    this.#handleDataChange(point);
+    this.#renderViewMode();
+    document.removeEventListener('keydown', this.escKeyDownHandler);
+  };
 
   init(pointData) {
     this.#pointData = pointData;

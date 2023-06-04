@@ -37,9 +37,14 @@ export default class EventPresenter {
   };
 
   #handlePointChange = (updatedPoint) => {
+
     this.#pointsModel.updatePoint(updatedPoint);
+
+
     this.#pointPresenters.get(updatedPoint.id)?.init(updatedPoint);
+
   };
+
 
   #renderPoint(point) {
     this.#pointPresenter = new PointPresenter({

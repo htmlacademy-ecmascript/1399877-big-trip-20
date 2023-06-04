@@ -1,10 +1,9 @@
-import AbstractStatefulView from '../framework/view/abstract-view.js';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view';
 
 function createItemEvent(data){
-  const {point, pointDestinations, pointOffers} = data;
-  const dataList = pointDestinations.map((element)=>`<option value="${element.name}"></option>`).join('');
-  const destinationsItemsList = pointDestinations?.map((element) => `<img class="event__photo" src="${element.picture[0].src}" alt="${element.picture[0].description}">`).join('');
-
+  const {point, destinationsModel, offersModel} = data;
+  const dataList = destinationsModel.map((element)=>`<option value="${element.name}"></option>`).join('');
+  const destinationsItemsList = destinationsModel?.map((element) => `<img class="event__photo" src="${element.picture[0].src}" alt="${element.picture[0].description}">`).join('');
   return (`            <li class="trip-events__item">
   <form class="event event--edit" action="#" method="post">
     <header class="event__header">
@@ -91,13 +90,64 @@ function createItemEvent(data){
           <span class="visually-hidden">Price</span>
           &euro;
         </label>
-        <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${pointOffers[0].offers[0].price}">
+        <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${offersModel.offers[0].price}">
       </div>
 
       <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
       <button class="event__reset-btn" type="reset">Cancel</button>
     </header>
+    <section class="event__details">
+    <section class="event__section  event__section--offers">
+      <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
+      <div class="event__available-offers">
+        <div class="event__offer-selector">
+          <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage" checked>
+          <label class="event__offer-label" for="event-offer-luggage-1">
+            <span class="event__offer-title">Add luggage</span>
+            &plus;&euro;&nbsp;
+            <span class="event__offer-price">30</span>
+          </label>
+        </div>
+
+        <div class="event__offer-selector">
+          <input class="event__offer-checkbox  visually-hidden" id="event-offer-comfort-1" type="checkbox" name="event-offer-comfort" checked>
+          <label class="event__offer-label" for="event-offer-comfort-1">
+            <span class="event__offer-title">Switch to comfort class</span>
+            &plus;&euro;&nbsp;
+            <span class="event__offer-price">100</span>
+          </label>
+        </div>
+
+        <div class="event__offer-selector">
+          <input class="event__offer-checkbox  visually-hidden" id="event-offer-meal-1" type="checkbox" name="event-offer-meal">
+          <label class="event__offer-label" for="event-offer-meal-1">
+            <span class="event__offer-title">Add meal</span>
+            &plus;&euro;&nbsp;
+            <span class="event__offer-price">15</span>
+          </label>
+        </div>
+
+        <div class="event__offer-selector">
+          <input class="event__offer-checkbox  visually-hidden" id="event-offer-seats-1" type="checkbox" name="event-offer-seats">
+          <label class="event__offer-label" for="event-offer-seats-1">
+            <span class="event__offer-title">Choose seats</span>
+            &plus;&euro;&nbsp;
+            <span class="event__offer-price">5</span>
+          </label>
+        </div>
+
+        <div class="event__offer-selector">
+          <input class="event__offer-checkbox  visually-hidden" id="event-offer-train-1" type="checkbox" name="event-offer-train">
+          <label class="event__offer-label" for="event-offer-train-1">
+            <span class="event__offer-title">Travel by train</span>
+            &plus;&euro;&nbsp;
+            <span class="event__offer-price">40</span>
+          </label>
+        </div>
+      </div>
+    </section>
+  </section>
     <section class="event__details">
       <section class="event__section  event__section--destination">
         <h3 class="event__section-title  event__section-title--destination">Destination</h3>
@@ -114,15 +164,28 @@ function createItemEvent(data){
 </li>`);
 }
 
-
 export default class EventEdit extends AbstractStatefulView {
+
+  #data = null;
+  #point = null;
   #destinationsModel = null;
   #offersModel = null;
+
+
   constructor({point, destinationsModel, offersModel}){
     super();
+    this.#point = point;
     this.#destinationsModel = destinationsModel;
     this.#offersModel = offersModel;
-    this._setState(EventEdit.parsePointToState({point}));
+
+    this._setState(EventEdit.parsePointToState(this.#data = {
+      point : this.#point,
+      destinationsModel: this.#destinationsModel.get(),
+      offersModel : this.#offersModel.getByType(this.#point.type),
+    }
+    ));
+
+    this._restoreHandlers();
   }
 
   get template() {
@@ -130,17 +193,48 @@ export default class EventEdit extends AbstractStatefulView {
   }
 
   setCancelHanlder(cb){
-    this.element.addEventListener('click',(evt)=>{
+    this.element.querySelector('.event__reset-btn').addEventListener('click',(evt)=>{
       evt.preventDefault();
-      if(evt.target.closest('.event__reset-btn')){
-        cb();
-        console.log(EventEdit.parsePointToState({point}));
-      }
+      cb();
     });
   }
 
-  static parsePointToState = ({point}) => ({point});
+  #updateState = (evt) => {
+    evt.preventDefault();
+    const submitUbdateState = () => {
+      EventEdit.parseStateToPoint(this._state);
 
-  static parseStateToPoint = (state) => state.point;
+      this.element.querySelector('.event__save-btn').removeEventListener('click', submitUbdateState);
+    };
+    this.element.querySelector('.event__save-btn').addEventListener('click', submitUbdateState);
+
+  };
+
+  #setTypeHandler = (evt) => {
+    this._state.point.type = evt.target.value;
+    this._state.offersModel = this.#offersModel.getByType(this._state.point.type);
+    this.element.querySelector('.event__type-toggle').click();
+    this.updateElement(this._state);
+  };
+
+  #setDestinationListHandler = (evt) => {
+    evt.preventDefault();
+    const destinationId = this._state.destinationsModel.find((element) => element.name === evt.target.value);
+    this._state.point.destination = destinationId.id;
+    this.updateElement(this._state);
+  };
+
+  _restoreHandlers(){
+    this.element.addEventListener('submit', this.#updateState);
+    this.element.querySelector('.event__type-group').addEventListener('change', this.#setTypeHandler);
+    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#updateState);
+    this.element.querySelector('.event__input--destination').addEventListener('change', this.#setDestinationListHandler);
+  }
+
+  setPoint = () => this._state.point;
+
+  static parsePointToState = (data) => ({...data});
+
+  static parseStateToPoint = (state) => state.data;
 }
 
