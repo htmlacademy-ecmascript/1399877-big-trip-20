@@ -207,7 +207,7 @@ export default class EventEdit extends AbstractStatefulView {
       this.element.querySelector('.event__save-btn').removeEventListener('click', submitUbdateState);
     };
     this.element.querySelector('.event__save-btn').addEventListener('click', submitUbdateState);
-
+    this.#setPoint(this._state);
   };
 
   #setTypeHandler = (evt) => {
@@ -231,7 +231,7 @@ export default class EventEdit extends AbstractStatefulView {
     this.element.querySelector('.event__input--destination').addEventListener('change', this.#setDestinationListHandler);
   }
 
-  setPoint = () => this._state.point;
+  #setPoint = (point) => point;
 
   static parsePointToState = (data) => ({...data});
 

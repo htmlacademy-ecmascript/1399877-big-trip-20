@@ -109,6 +109,7 @@ export default class PointPresenter{
       isFavorite: !this.#pointData.isFavorite
     });
   };
+  //this.#handleDataChange использовать для state
 
   changeUpdate = () =>{
     this.#handleDataChange(...this.#pointData);
