@@ -44,12 +44,12 @@ export default class PointPresenter{
   #createEditModeComponent(point) {
     const pointEdit = new EventEdit ({
       point,
-      destinationsModel : this.#destinationsModel,
-      offersModel : this.#offersModel,
-      onhandlerPoint : this.#handlerPointSubmit
+      destinations : this.#destinationsModel.get(),
+      offers : this.#offersModel.get(),
+      onSave : this.#handlerPointSubmit
     });
 
-    pointEdit.setCancelHanlder(this.closeEditMode);
+    pointEdit.setCancelHandler(this.closeEditMode);
     return pointEdit;
   }
 
@@ -109,11 +109,13 @@ export default class PointPresenter{
       isFavorite: !this.#pointData.isFavorite
     });
   };
-  //this.#handleDataChange использовать для state
 
-  changeUpdate = () =>{
-    this.#handleDataChange(...this.#pointData);
-  };
+
+  // changeUpdate = () =>{
+  //   console.log(this.#pointData);
+  //   this.#handleDataChange(...this.#pointData);
+  //   console.log(this.#pointEditComponent._state.point);
+  // };
 
   destroy(){
     remove(this.#pointEditComponent);

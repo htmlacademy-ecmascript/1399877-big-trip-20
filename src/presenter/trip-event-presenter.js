@@ -40,7 +40,6 @@ export default class EventPresenter {
 
     this.#pointsModel.updatePoint(updatedPoint);
 
-
     this.#pointPresenters.get(updatedPoint.id)?.init(updatedPoint);
 
   };
