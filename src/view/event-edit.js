@@ -1,6 +1,7 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view';
 
 function createItemEvent(data){
+
   const {point, destinations , offers} = data;
   const currentOffers = offers.find((offer) => offer.type === point.type)?.offers ?? [];
   const currentDestination = destinations.find((destination) => destination.id === point.destination);
@@ -11,8 +12,8 @@ function createItemEvent(data){
 
   const currentOffersList = currentOffers.map((offer) => `
     <div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="${offer.id}" type="checkbox" name="event-offer-luggage ${offer.type === point.type ? ' checked' : ''}"
-        ${point.offers?.some((offerId) => offerId === offer.id) ? ' checked' : ''}>
+      <input class="event__offer-checkbox  visually-hidden" id="${offer.id}" type="checkbox" name="event-offer-luggage"
+      ${point.offers?.some((offerId) => offerId === offer.id) ? ' checked' : ''}>
       <label class="event__offer-label" for="${offer.id}">
         <span class="event__offer-title">${offer.title}</span>
         &plus;&euro;&nbsp;
@@ -23,7 +24,7 @@ function createItemEvent(data){
   const typeList = offers.map((offer) => `
     <div class="event__type-item">
       <input id="event-type-${offer.type}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${offer.type}">
-      <label class="event__type-label  event__type-label--${offer.type}" for="event-type-${offer.type}">${offer.type}}</label>
+      <label class="event__type-label  event__type-label--${offer.type}" for="event-type-${offer.type}">${offer.type}</label>
     </div>`).join('');
 
   return (`<li class="trip-events__item">
@@ -142,7 +143,26 @@ export default class EventEdit extends AbstractStatefulView {
   #typeChangeHandler = (evt) => {
     this._state.point.type = evt.target.value;
 
-    this.updateElement(this._state);
+    this.updateElement({
+      point: {
+        ...this._state.point,
+        type: evt.target.value,
+        offers : []
+      }
+    });
+  };
+
+  #offerClickHandler = (evt) => {
+    evt.preventDefault();
+
+    const checkedBoxes = Array.from(this.element.querySelectorAll('.event__offer-checkbox:checked'));
+
+    this._setState({
+      point : {
+        ...this._state.point,
+        offers : checkedBoxes.map((element) => element.id)
+      }
+    });
   };
 
   #destinationListChangeHandler = (evt) => {
@@ -158,6 +178,7 @@ export default class EventEdit extends AbstractStatefulView {
     this.updateElement(this._state);
   };
 
+
   _restoreHandlers(){
     this.element.querySelector('form').addEventListener('submit', this.#formSubmitHandler);
     this.element.querySelector('.event__reset-btn').addEventListener('click', this.#resetButtonClickHandler);
@@ -165,6 +186,7 @@ export default class EventEdit extends AbstractStatefulView {
     this.element.querySelector('.event__type-group').addEventListener('change', this.#typeChangeHandler);
     this.element.querySelector('.event__input--destination').addEventListener('change', this.#destinationListChangeHandler);
     this.element.querySelector('.event__input--price').addEventListener('change', this.#PriceChangeHandler);
+    this.element.querySelector('.event__section--offers').addEventListener('change', this.#offerClickHandler);
   }
 
   static parsePointToState = (data) => ({...data});

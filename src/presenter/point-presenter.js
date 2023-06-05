@@ -30,8 +30,8 @@ export default class PointPresenter{
   #createViewModeComponent(point) {
     const pointView = new EventsView({
       point,
-      pointDestination : this.#destinationsModel.getById(point.destination),
-      pointOffers : this.#offersModel.getByType(point.type),
+      destination : this.#destinationsModel.getById(point.destination),
+      offers : this.#offersModel.getByType(point.type),
     });
 
     pointView.setEditHandler(this.openEditMode);
