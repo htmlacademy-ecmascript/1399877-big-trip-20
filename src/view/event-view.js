@@ -3,12 +3,12 @@ import {formatStringToShortDate,formatStringShorTime, callcDate} from '../utils/
 
 
 function createEventsItemViewTemplate(data){
-  const {point, pointDestination, pointOffers} = data;
-  const offersItemsList = pointOffers?.offers?.map((pointOffer) => `
+  const {point, destination, offers} = data;
+  const offersItemsList = offers?.offers?.map((offer) => `
 <li class="event__offer">
-        <span class="event__offer-title">${pointOffer.title}</span>
-        &plus;&euro;&nbsp;
-        <span class="event__offer-price">${pointOffer.price}</span>
+        <span class="event__offer-title">${point.offers?.some((offerId) => offerId === offer.id) ? offer.title : ''}</span>
+        ${point.offers?.some((offerId) => offerId === offer.id) ? ' &plus; &euro;&nbsp;' : ''}
+        <span class="event__offer-price">${point.offers?.some((offerId) => offerId === offer.id) ? offer.price : ''}</span>
       </li>
 `).join('');
   return(`            <li class="trip-events__item">
@@ -17,7 +17,7 @@ function createEventsItemViewTemplate(data){
     <div class="event__type">
     <img class="event__type-icon" width="42" height="42" src="img/icons/${point.type}.png" alt="Event type icon">
     </div>
-    <h3 class="event__title">${point.type} ${pointDestination.name}</h3>
+    <h3 class="event__title">${point.type} ${destination.name}</h3>
     <div class="event__schedule">
       <p class="event__time">
         <time class="event__start-time" datetime="${point.dateFrom}">${formatStringShorTime(point.dateFrom)}</time>
@@ -27,7 +27,7 @@ function createEventsItemViewTemplate(data){
       <p class="event__duration">${callcDate(point.dateFrom ,point.dateTo)}</p>
     </div>
     <p class="event__price">
-      &euro;&nbsp;<span class="event__price-value">${pointOffers.offers[0].price}</span>
+      &euro;&nbsp;<span class="event__price-value">${point.basePrice}</span>
     </p>
     <h4 class="visually-hidden">Offers:</h4>
     <ul class="event__selected-offers">
@@ -47,14 +47,24 @@ function createEventsItemViewTemplate(data){
 }
 
 export default class EventsView extends AbstractView{
-  #data = null;
-  constructor(data){
+
+  #destination;
+  #offers;
+  #point;
+
+  constructor({point, destination, offers}){
     super();
-    this.#data = data;
+    this.#point = point;
+    this.#destination = destination;
+    this.#offers = offers;
   }
 
   get template() {
-    return createEventsItemViewTemplate(this.#data);
+    return createEventsItemViewTemplate({
+      point : this.#point,
+      destination : this.#destination,
+      offers : this.#offers,
+    });
   }
 
   setEditHandler(cb){

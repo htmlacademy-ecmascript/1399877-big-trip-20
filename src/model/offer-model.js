@@ -11,4 +11,12 @@ export default class OfferModel{
   getByType(type){
     return this.offer.find((offer)=> offer.type === type);
   }
+
+  updateOffer(updatedOffer) {
+    this.offer.find((offer) => {
+      if(offer.id === updatedOffer.id) {
+        Object.assign(offer, updatedOffer);
+      }
+    });
+  }
 }

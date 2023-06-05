@@ -16,8 +16,10 @@ export default class SortPresenter{
   }
 
   #onSortTypeChange = (sortType) => {
-    this.#currentSortType = sortType;
-    this.#onSortChange?.();
+    if (this.#currentSortType !== sortType) {
+      this.#currentSortType = sortType;
+      this.#onSortChange?.();
+    }
   };
 
   #createSortView = () => {

@@ -18,7 +18,6 @@ export default class PointPresenter{
   #handleEditModeChange = null;
   #handleDataChange = null;
   #mode = PointMode.VIEW;
-  #view = null;
 
 
   constructor({eventsListView, offersModel, destinationsModel, onDataChange}) {
@@ -31,8 +30,8 @@ export default class PointPresenter{
   #createViewModeComponent(point) {
     const pointView = new EventsView({
       point,
-      pointDestination : this.#destinationsModel.getById(point.destination),
-      pointOffers : this.#offersModel.getByType(point.type),
+      destination : this.#destinationsModel.getById(point.destination),
+      offers : this.#offersModel.getByType(point.type),
     });
 
     pointView.setEditHandler(this.openEditMode);
@@ -45,11 +44,12 @@ export default class PointPresenter{
   #createEditModeComponent(point) {
     const pointEdit = new EventEdit ({
       point,
-      pointDestinations : this.#destinationsModel.get(),
-      pointOffers : this.#offersModel.get(),
+      destinations : this.#destinationsModel.get(),
+      offers : this.#offersModel.get(),
+      onSave : this.#handlerPointSubmit
     });
 
-    pointEdit.setCancelHanlder(this.closeEditMode);
+    pointEdit.setCancelHandler(this.closeEditMode);
     return pointEdit;
   }
 
@@ -70,10 +70,10 @@ export default class PointPresenter{
   }
 
   #renderViewMode() {
-    this.#view = this.#createViewModeComponent(this.#pointData);
-    this.#renderOrReplace(this.#view);
+    const view = this.#createViewModeComponent(this.#pointData);
+    this.#renderOrReplace(view);
 
-    this.#pointViewComponent = this.#view;
+    this.#pointViewComponent = view;
     this.#mode = PointMode.VIEW;
   }
 
@@ -110,9 +110,23 @@ export default class PointPresenter{
     });
   };
 
+
+  // changeUpdate = () =>{
+  //   console.log(this.#pointData);
+  //   this.#handleDataChange(...this.#pointData);
+  //   console.log(this.#pointEditComponent._state.point);
+  // };
+
   destroy(){
-    remove(this.#view);
+    remove(this.#pointEditComponent);
+    remove(this.#pointViewComponent);
   }
+
+  #handlerPointSubmit = (point) => {
+    this.#handleDataChange(point);
+    this.#renderViewMode();
+    document.removeEventListener('keydown', this.escKeyDownHandler);
+  };
 
   init(pointData) {
     this.#pointData = pointData;

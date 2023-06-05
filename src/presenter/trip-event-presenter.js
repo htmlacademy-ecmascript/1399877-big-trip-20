@@ -16,7 +16,6 @@ export default class EventPresenter {
   #offersModel = null;
   #destinationsModel = null;
   #pointPresenter = null;
-  #points = null;
   #sortPresenter = null;
 
   constructor({listContainer, pointsModel, offersModel, destinationsModel}){
@@ -38,9 +37,13 @@ export default class EventPresenter {
   };
 
   #handlePointChange = (updatedPoint) => {
+
     this.#pointsModel.updatePoint(updatedPoint);
+
     this.#pointPresenters.get(updatedPoint.id)?.init(updatedPoint);
+
   };
+
 
   #renderPoint(point) {
     this.#pointPresenter = new PointPresenter({
@@ -69,10 +72,7 @@ export default class EventPresenter {
     this.#pointPresenters.forEach((presenter) => {
       presenter.destroy();
     });
-    // this.#sortPresenter.destroy();
     this.#pointPresenters.clear();
-
-    // this.#eventsListView.removeElement();
   };
 
   init() {
