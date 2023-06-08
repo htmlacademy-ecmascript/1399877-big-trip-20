@@ -1,6 +1,7 @@
 import { render, replace, remove } from '../framework/render.js';
 import EventsView from '../view/event-view.js';
 import EventEdit from '../view/event-edit.js';
+import {UpdateType, UserAction} from '../const.js';
 
 const PointMode = {
   VIEW: 'view',
@@ -104,18 +105,12 @@ export default class PointPresenter{
   };
 
   changeFavorite = () => {
-    this.#handleDataChange({
-      ...this.#pointData,
-      isFavorite: !this.#pointData.isFavorite
-    });
+    this.#handleDataChange(
+      UserAction.UPDATE_POINT,
+      UpdateType.MINOR,
+      {...this.#pointData,isFavorite: !this.#pointData.isFavorite});
   };
 
-
-  // changeUpdate = () =>{
-  //   console.log(this.#pointData);
-  //   this.#handleDataChange(...this.#pointData);
-  //   console.log(this.#pointEditComponent._state.point);
-  // };
 
   destroy(){
     remove(this.#pointEditComponent);
@@ -123,7 +118,12 @@ export default class PointPresenter{
   }
 
   #handlerPointSubmit = (point) => {
-    this.#handleDataChange(point);
+    this.#pointData = point;
+    this.#handleDataChange(
+      UserAction.UPDATE_POINT,
+      UpdateType.MINOR,
+      {...this.#pointData});
+
     this.#renderViewMode();
     document.removeEventListener('keydown', this.escKeyDownHandler);
   };

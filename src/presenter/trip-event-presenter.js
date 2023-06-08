@@ -3,6 +3,8 @@ import ListEmpty from '../view/list-empty.js';
 import PointPresenter from './point-presenter.js';
 import SortPresenter from './sort-presenter.js';
 import EventsListView from '../view/events-list-view.js';
+import { UserAction, UpdateType } from '../const.js';
+
 
 export default class EventPresenter {
   #eventsListView = new EventsListView();
@@ -24,24 +26,56 @@ export default class EventPresenter {
     this.#offersModel = offersModel;
     this.#destinationsModel = destinationsModel;
 
+    this.#pointsModel.addObserver(this.#handelModelEvent);
+
     this.#sortPresenter = new SortPresenter({
       listContainer,
       onSortChange: this.#handeSortChange
     });
   }
 
+  get point(){
+    return this.#pointsModel.get();
+  }
+
   #handeSortChange = () => {
     this.#sortPresenter.destroy();
-    this.#clearPoits();
+    this.#clearPoints();
     this.init();
   };
 
-  #handlePointChange = (updatedPoint) => {
 
-    this.#pointsModel.updatePoint(updatedPoint);
+  #handelViewAction = (actionType, updateType, updatePoint) => {
 
-    this.#pointPresenters.get(updatedPoint.id)?.init(updatedPoint);
+    switch (actionType) {
+      case UserAction.UPDATE_POINT:
+        this.#pointsModel.updatePoint(updateType, updatePoint);
+        break;
+      case UserAction.ADD_POINT:
+        this.#pointsModel.addPoint(updateType,updatePoint);
+        break;
+      case UserAction.DELETE_POINT:
+        this.#pointsModel.deletePoint(updateType, updatePoint);
+        break;
+    }
+  };
 
+  #handelModelEvent = (updateType, point) => {
+
+
+    switch(updateType) {
+      case UpdateType.PATCH:
+        this.#pointPresenters.get(point.id).init(point);
+        break;
+      case UpdateType.MINOR:
+        this.#clearPoints();
+        this.init(this.point);
+        break;
+      case UpdateType.MAJOR:
+        this.#clearPoints(true);
+        this.init();
+        break;
+    }
   };
 
 
@@ -50,7 +84,7 @@ export default class EventPresenter {
       eventsListView: this.#eventsListView,
       offersModel: this.#offersModel,
       destinationsModel: this.#destinationsModel,
-      onDataChange: this.#handlePointChange,
+      onDataChange: this.#handelViewAction,
     });
 
     this.#pointPresenter.init(point);
@@ -68,16 +102,18 @@ export default class EventPresenter {
     document.addEventListener('keydown', this.#pointPresenter.escKeyDownHandler);
   }
 
-  #clearPoits = () => {
-    this.#pointPresenters.forEach((presenter) => {
-      presenter.destroy();
-    });
+  #clearPoints = ({resetSortType = false} = {}) => {
+    this.#pointPresenters.forEach((presenter) => presenter.destroy());
     this.#pointPresenters.clear();
+
+    if(resetSortType) {
+      this.#sortPresenter.init(this.point);
+    }
   };
 
   init() {
-    const pointsData = [...this.#pointsModel.get()];
-    this.#clearPoits();
+    const pointsData = [...this.point];
+    this.#clearPoints(true);
     if (pointsData.length) {
       const sortedPoints = this.#sortPresenter.sortPoints(pointsData);
       this.#sortPresenter.init();

@@ -112,7 +112,7 @@ export default class EventEdit extends AbstractStatefulView {
 
   #datepickerFrom = null;
   #datepickerTo = null;
-  #setDatepickerTo = null;
+  // #setDatepickerTo = null;
 
   constructor({point, destinations, offers, onSave}){
     super();

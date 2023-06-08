@@ -2,13 +2,14 @@ import SortView from '../view/sort-view.js';
 import {render, RenderPosition, replace, remove} from '../framework/render.js';
 import { SortType } from '../const.js';
 import { sort } from '../utils/sort.js';
-
+import { UpdateType, UserAction } from '../const.js';
 
 export default class SortPresenter{
   #listContainer = null;
   #currentSortType = SortType.DAY;
   #onSortChange = null;
   #sortView = null;
+  #points = null;
 
   constructor({listContainer, onSortChange}){
     this.#listContainer = listContainer;
@@ -34,9 +35,14 @@ export default class SortPresenter{
       replace(this.#createSortView(), this.#sortView);
     }
   }
+  // UserAction.UPDATE_POINT,
+  //     UpdateType.MINOR
 
   sortPoints(points) {
-    return sort[this.#currentSortType](points);
+    this.#points = sort[this.#currentSortType](points);
+    return (UserAction.UPDATE_POINT,
+    UpdateType.MINOR,
+    this.#points);
   }
 
   destroy(){
