@@ -37,6 +37,7 @@ export default class SortView extends AbstractView{
 
   constructor({onSortTypeChange, currentSortType}){
     super();
+    this.#SortType = SortType;
 
     this.#sortMap = Object.values(SortType)
       .map((type) => ({
@@ -47,7 +48,7 @@ export default class SortView extends AbstractView{
 
 
     this.#onsortTypeChange = onSortTypeChange;
-    this.#SortType = SortType;
+
     this.element.addEventListener('click', this.#sortTypeChangeHandler);
 
   }
@@ -60,7 +61,6 @@ export default class SortView extends AbstractView{
     if(evt.target.closest('.trip-sort__input')){
       evt.preventDefault();
       this.#onsortTypeChange(evt.target.dataset['sortType']);
-      // console.log(SortType[(evt.target.dataset['sortType']).toUpperCase()]);
     }
   };
 }

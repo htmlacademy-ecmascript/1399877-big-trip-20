@@ -78,7 +78,7 @@ function createItemEvent(data){
       </div>
 
       <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-      <button class="event__reset-btn" type="reset">Cancel</button>
+      <button class="event__reset-btn" type="reset">Delete</button>
     </header>
     <section class="event__details">
     <section class="event__section  event__section--offers">
@@ -112,9 +112,9 @@ export default class EventEdit extends AbstractStatefulView {
 
   #datepickerFrom = null;
   #datepickerTo = null;
-  // #setDatepickerTo = null;
+  #handelDeleteClick = null;
 
-  constructor({point, destinations, offers, onSave}){
+  constructor({point, destinations, offers, onSave, onDelete}){
     super();
     this.#destinations = destinations;
     this.#offers = offers;
@@ -122,6 +122,7 @@ export default class EventEdit extends AbstractStatefulView {
     this.#handelSave = onSave;
 
     this._setState(EventEdit.parsePointToState({point}));
+    this.#handelDeleteClick = onDelete;
 
     this._restoreHandlers();
   }
@@ -189,7 +190,7 @@ export default class EventEdit extends AbstractStatefulView {
 
   _restoreHandlers(){
     this.element.querySelector('form').addEventListener('submit', this.#formSubmitHandler);
-    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#resetButtonClickHandler);
+    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#formDeleteClickHandler);
 
     this.element.querySelector('.event__type-group').addEventListener('change', this.#typeChangeHandler);
     this.element.querySelector('.event__input--destination').addEventListener('change', this.#destinationListChangeHandler);
@@ -199,6 +200,11 @@ export default class EventEdit extends AbstractStatefulView {
     this.#setDatapickers();
 
   }
+
+  #formDeleteClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handelDeleteClick(EventEdit.parseStateToPoint(this._state));
+  };
 
   removeElement = () => {
     super.removeElement();

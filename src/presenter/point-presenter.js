@@ -19,14 +19,23 @@ export default class PointPresenter{
   #handleEditModeChange = null;
   #handleDataChange = null;
   #mode = PointMode.VIEW;
+  #onDeleteClick = null;
 
-
-  constructor({eventsListView, offersModel, destinationsModel, onDataChange}) {
+  constructor({eventsListView, offersModel, destinationsModel, onDataChange, onDeleteClick}) {
     this.#eventsListView = eventsListView;
     this.#offersModel = offersModel;
     this.#destinationsModel = destinationsModel;
     this.#handleDataChange = onDataChange;
+    this.#onDeleteClick = onDeleteClick;
   }
+
+  #handelDeleteClick = (point) => {
+    this.#handleDataChange(
+      UserAction.DELETE_POINT,
+      UpdateType.MINOR,
+      point,
+    );
+  };
 
   #createViewModeComponent(point) {
     const pointView = new EventsView({
@@ -47,7 +56,8 @@ export default class PointPresenter{
       point,
       destinations : this.#destinationsModel.get(),
       offers : this.#offersModel.get(),
-      onSave : this.#handlerPointSubmit
+      onSave : this.#handlerPointSubmit,
+      onDelete : this.#handelDeleteClick
     });
 
     pointEdit.setCancelHandler(this.closeEditMode);

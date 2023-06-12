@@ -46,7 +46,6 @@ export default class EventPresenter {
 
 
   #handelViewAction = (actionType, updateType, updatePoint) => {
-
     switch (actionType) {
       case UserAction.UPDATE_POINT:
         this.#pointsModel.updatePoint(updateType, updatePoint);
@@ -61,8 +60,6 @@ export default class EventPresenter {
   };
 
   #handelModelEvent = (updateType, point) => {
-
-
     switch(updateType) {
       case UpdateType.PATCH:
         this.#pointPresenters.get(point.id).init(point);
@@ -72,7 +69,7 @@ export default class EventPresenter {
         this.init(this.point);
         break;
       case UpdateType.MAJOR:
-        this.#clearPoints(true);
+        this.#clearPoints();
         this.init();
         break;
     }
@@ -102,18 +99,15 @@ export default class EventPresenter {
     document.addEventListener('keydown', this.#pointPresenter.escKeyDownHandler);
   }
 
-  #clearPoints = ({resetSortType = false} = {}) => {
-    this.#pointPresenters.forEach((presenter) => presenter.destroy());
+  #clearPoints = () => {
+    this.#pointPresenters.forEach((presenter) => {
+      presenter.destroy();
+    });
     this.#pointPresenters.clear();
-
-    if(resetSortType) {
-      this.#sortPresenter.init(this.point);
-    }
   };
 
   init() {
     const pointsData = [...this.point];
-    this.#clearPoints(true);
     if (pointsData.length) {
       const sortedPoints = this.#sortPresenter.sortPoints(pointsData);
       this.#sortPresenter.init();

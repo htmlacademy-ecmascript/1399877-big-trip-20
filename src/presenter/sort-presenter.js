@@ -24,8 +24,8 @@ export default class SortPresenter{
   };
 
   #createSortView = () => {
-    this.SortView = new SortView({onSortTypeChange : this.#onSortTypeChange, currentSortType : this.#currentSortType});
-    return this.SortView;
+    this.#sortView = new SortView({onSortTypeChange : this.#onSortTypeChange, currentSortType : this.#currentSortType});
+    return this.#sortView;
   };
 
   #sortRender() {
@@ -35,8 +35,6 @@ export default class SortPresenter{
       replace(this.#createSortView(), this.#sortView);
     }
   }
-  // UserAction.UPDATE_POINT,
-  //     UpdateType.MINOR
 
   sortPoints(points) {
     this.#points = sort[this.#currentSortType](points);
@@ -46,7 +44,7 @@ export default class SortPresenter{
   }
 
   destroy(){
-    remove(this.SortView);
+    remove(this.#sortView);
   }
 
   init(){

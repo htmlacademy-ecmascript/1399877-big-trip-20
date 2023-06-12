@@ -31,7 +31,7 @@ export default class PointModel extends Observable{
   }
 
   deletePoint(updateType, updatedPoint){
-    const pointIndex = this.#points.find((point) => point.id === updatedPoint.id);
+    const pointIndex = this.#points.findIndex((point) => point.id === updatedPoint.id);
     this.#points = [
       ...this.#points.slice(0,pointIndex),
       ...this.#points.slice(pointIndex, +1)
