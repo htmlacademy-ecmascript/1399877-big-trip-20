@@ -3,8 +3,9 @@ import ListEmpty from '../view/list-empty.js';
 import PointPresenter from './point-presenter.js';
 import SortPresenter from './sort-presenter.js';
 import EventsListView from '../view/events-list-view.js';
-import { UserAction, UpdateType } from '../const.js';
-
+import { UserAction, UpdateType, templatePoint } from '../const.js';
+import SortModel from '../model/sortModel.js';
+import AddPointPresenter from './add-point-presenter.js';
 
 export default class EventPresenter {
   #eventsListView = new EventsListView();
@@ -19,18 +20,22 @@ export default class EventPresenter {
   #destinationsModel = null;
   #pointPresenter = null;
   #sortPresenter = null;
+  #sortModel = null;
+  #newPoint = null;
 
   constructor({listContainer, pointsModel, offersModel, destinationsModel}){
     this.#listContainer = listContainer;
     this.#pointsModel = pointsModel;
     this.#offersModel = offersModel;
     this.#destinationsModel = destinationsModel;
+    this.#sortModel = new SortModel();
 
     this.#pointsModel.addObserver(this.#handelModelEvent);
+    this.#sortModel.addObserver(this.#handelModelEvent);
 
     this.#sortPresenter = new SortPresenter({
       listContainer,
-      onSortChange: this.#handeSortChange
+      sortModel : this.#sortModel
     });
   }
 
@@ -38,14 +43,23 @@ export default class EventPresenter {
     return this.#pointsModel.get();
   }
 
-  #handeSortChange = () => {
-    this.#sortPresenter.destroy();
-    this.#clearPoints();
-    this.init();
+  #addNewPoint = () => {
+    this.#newPoint = new AddPointPresenter({
+      point : templatePoint,
+      offers : this.#offersModel,
+      destinations : this.#destinationsModel,
+      listContainer : this.#listContainer,
+      onDataChange: this.#handelViewAction
+    });
+    this.#newPoint.init();
   };
 
+  #hendelNewPoint(){
+    document.querySelector('.trip-main__event-add-btn').addEventListener('click', this.#addNewPoint);
+  }
 
   #handelViewAction = (actionType, updateType, updatePoint) => {
+    console.log(actionType, updateType, updatePoint)
     switch (actionType) {
       case UserAction.UPDATE_POINT:
         this.#pointsModel.updatePoint(updateType, updatePoint);
@@ -66,10 +80,10 @@ export default class EventPresenter {
         break;
       case UpdateType.MINOR:
         this.#clearPoints();
-        this.init(this.point);
+        this.init();
         break;
       case UpdateType.MAJOR:
-        this.#clearPoints();
+        this.#clearPoints({resetSortType : true});
         this.init();
         break;
     }
@@ -99,14 +113,18 @@ export default class EventPresenter {
     document.addEventListener('keydown', this.#pointPresenter.escKeyDownHandler);
   }
 
-  #clearPoints = () => {
+  #clearPoints = (resetSortType = false) => {
     this.#pointPresenters.forEach((presenter) => {
       presenter.destroy();
     });
     this.#pointPresenters.clear();
+    if(resetSortType) {
+      console.log(this.#sortModel);
+    }
   };
 
   init() {
+    this.#hendelNewPoint();
     const pointsData = [...this.point];
     if (pointsData.length) {
       const sortedPoints = this.#sortPresenter.sortPoints(pointsData);

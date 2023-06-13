@@ -46,4 +46,17 @@ const UpdateType = {
   MAJOR : 'MAJOR',
 };
 
-export {TYPES, FilterType, SortType, enabledSortType, UpdateType, UserAction};
+const templatePoint = {
+  id : crypto.randomUUID(),
+  basePrice : '',
+  dateFrom : '',
+  dateTo : '',
+  destination : '',
+  isFavorite : false,
+  offers: '',
+  type : '',
+
+};
+
+
+export {TYPES, FilterType, SortType, enabledSortType, UpdateType, UserAction, templatePoint};

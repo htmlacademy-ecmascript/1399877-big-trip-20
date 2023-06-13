@@ -3,6 +3,7 @@ export default class PointModel extends Observable{
 
   #service = null;
   #points = null;
+
   constructor(service){
     super();
     this.#service = service;
@@ -23,6 +24,7 @@ export default class PointModel extends Observable{
   }
 
   addPoint(updateType, updatedPoint){
+    console.log(updateType,updatedPoint)
     this.#points = [
       updatedPoint,
       ...this.#points,
@@ -32,10 +34,9 @@ export default class PointModel extends Observable{
 
   deletePoint(updateType, updatedPoint){
     const pointIndex = this.#points.findIndex((point) => point.id === updatedPoint.id);
-    this.#points = [
-      ...this.#points.slice(0,pointIndex),
-      ...this.#points.slice(pointIndex, +1)
-    ];
+
+    this.#points.splice(pointIndex, 1);
+
     this._notify(updateType,updatedPoint);
   }
 }

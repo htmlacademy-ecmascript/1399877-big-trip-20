@@ -1,15 +1,18 @@
 export default class DestinationsModel{
+
+  #destination = null;
+  #service = null;
   constructor(service){
-    this.service = service;
-    this.destination = this.service.getDestinations();
+    this.#service = service;
+    this.#destination = this.#service.getDestinations();
   }
 
   get(){
-    return this.destination;
+    return this.#destination;
   }
 
   getById(idDestination){
-    return this.destination.find((element)=> {
+    return this.#destination.find((element)=> {
       if(idDestination === element.id){
         return element;
       }
@@ -17,7 +20,7 @@ export default class DestinationsModel{
   }
 
   updateDestination(updatedDestination) {
-    this.destination.find((destination) => {
+    this.#destination.find((destination) => {
       if(destination.id === updatedDestination.id) {
         Object.assign(destination, updatedDestination);
       }

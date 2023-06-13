@@ -1,46 +1,26 @@
 import SortView from '../view/sort-view.js';
-import {render, RenderPosition, replace, remove} from '../framework/render.js';
-import { SortType } from '../const.js';
+import {render, RenderPosition, remove} from '../framework/render.js';
 import { sort } from '../utils/sort.js';
-import { UpdateType, UserAction } from '../const.js';
+import { UpdateType } from '../const.js';
 
 export default class SortPresenter{
   #listContainer = null;
-  #currentSortType = SortType.DAY;
-  #onSortChange = null;
   #sortView = null;
-  #points = null;
+  #sortModel = null;
 
-  constructor({listContainer, onSortChange}){
+  constructor({listContainer, sortModel}){
     this.#listContainer = listContainer;
-    this.#onSortChange = onSortChange;
+    this.#sortModel = sortModel;
   }
 
   #onSortTypeChange = (sortType) => {
-    if (this.#currentSortType !== sortType) {
-      this.#currentSortType = sortType;
-      this.#onSortChange?.();
+    if (!this.#sortModel.type !== sortType) {
+      this.#sortModel.setType(UpdateType.MINOR,sortType);
     }
   };
-
-  #createSortView = () => {
-    this.#sortView = new SortView({onSortTypeChange : this.#onSortTypeChange, currentSortType : this.#currentSortType});
-    return this.#sortView;
-  };
-
-  #sortRender() {
-    if(!this.#sortView){
-      render(this.#createSortView(), this.#listContainer, RenderPosition.AFTERBEGIN);
-    } else {
-      replace(this.#createSortView(), this.#sortView);
-    }
-  }
 
   sortPoints(points) {
-    this.#points = sort[this.#currentSortType](points);
-    return (UserAction.UPDATE_POINT,
-    UpdateType.MINOR,
-    this.#points);
+    return sort[this.#sortModel.type](points);
   }
 
   destroy(){
@@ -48,6 +28,17 @@ export default class SortPresenter{
   }
 
   init(){
-    this.#sortRender();
+    if(!this.#sortView) {
+      this.#sortView = new SortView({
+        onSortTypeChange : this.#onSortTypeChange,
+        currentSortType : this.#sortModel.type
+      });
+      render(this.#sortView, this.#listContainer, RenderPosition.AFTERBEGIN);
+    } else {
+      this.#sortView.updateElement({
+        sortType : this.#sortModel.type
+      });
+    }
+
   }
 }

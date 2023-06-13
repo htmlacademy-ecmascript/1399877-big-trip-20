@@ -3,6 +3,7 @@ import EventsView from '../view/event-view.js';
 import EventEdit from '../view/event-edit.js';
 import {UpdateType, UserAction} from '../const.js';
 
+
 const PointMode = {
   VIEW: 'view',
   EDIT: 'edit',
@@ -16,18 +17,19 @@ export default class PointPresenter{
   #pointData = null;
   #pointViewComponent = null;
   #pointEditComponent = null;
+  #newPoint = null;
   #handleEditModeChange = null;
   #handleDataChange = null;
   #mode = PointMode.VIEW;
   #onDeleteClick = null;
 
-  constructor({eventsListView, offersModel, destinationsModel, onDataChange, onDeleteClick}) {
+  constructor({eventsListView, offersModel, destinationsModel, onDataChange}) {
     this.#eventsListView = eventsListView;
     this.#offersModel = offersModel;
     this.#destinationsModel = destinationsModel;
     this.#handleDataChange = onDataChange;
-    this.#onDeleteClick = onDeleteClick;
   }
+
 
   #handelDeleteClick = (point) => {
     this.#handleDataChange(
@@ -37,13 +39,13 @@ export default class PointPresenter{
     );
   };
 
+
   #createViewModeComponent(point) {
     const pointView = new EventsView({
       point,
       destination : this.#destinationsModel.getById(point.destination),
       offers : this.#offersModel.getByType(point.type),
     });
-
     pointView.setEditHandler(this.openEditMode);
     pointView.setEditHandlerKey(this.openEditMode);
     pointView.setFavoriteHandler(this.changeFavorite);
@@ -93,6 +95,7 @@ export default class PointPresenter{
     if(this.#mode === PointMode.VIEW){
       this.#renderEditMode();
       this.#handleEditModeChange?.();
+      document.addEventListener('keydown', this.escKeyDownHandler);
     }
   };
 
@@ -103,6 +106,7 @@ export default class PointPresenter{
   closeEditMode = () => {
     if(this.#mode === PointMode.EDIT){
       this.#renderViewMode();
+      document.removeEventListener('keydown', this.escKeyDownHandler);
     }
   };
 
@@ -110,19 +114,19 @@ export default class PointPresenter{
     if(evt.key === 'Escape'){
       evt.preventDefault();
       this.closeEditMode();
-      document.removeEventListener('keydown', this.escKeyDownHandler);
     }
   };
 
   changeFavorite = () => {
     this.#handleDataChange(
       UserAction.UPDATE_POINT,
-      UpdateType.MINOR,
+      UpdateType.PATCH,
       {...this.#pointData,isFavorite: !this.#pointData.isFavorite});
   };
 
 
   destroy(){
+    this.closeEditMode();
     remove(this.#pointEditComponent);
     remove(this.#pointViewComponent);
   }
@@ -135,7 +139,6 @@ export default class PointPresenter{
       {...this.#pointData});
 
     this.#renderViewMode();
-    document.removeEventListener('keydown', this.escKeyDownHandler);
   };
 
   init(pointData) {
