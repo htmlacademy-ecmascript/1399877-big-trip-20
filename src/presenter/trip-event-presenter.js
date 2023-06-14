@@ -3,9 +3,13 @@ import ListEmpty from '../view/list-empty.js';
 import PointPresenter from './point-presenter.js';
 import SortPresenter from './sort-presenter.js';
 import EventsListView from '../view/events-list-view.js';
-import { UserAction, UpdateType, templatePoint } from '../const.js';
+import { UserAction, UpdateType, templatePoint, SortType } from '../const.js';
 import SortModel from '../model/sortModel.js';
 import AddPointPresenter from './add-point-presenter.js';
+import FilterPresenter from './filter-presenter.js';
+import FilterModel from '../model/filter-model.js';
+import { filter } from '../utils/filter.js';
+import { sort } from '../utils/sort.js';
 
 export default class EventPresenter {
   #eventsListView = new EventsListView();
@@ -21,17 +25,24 @@ export default class EventPresenter {
   #pointPresenter = null;
   #sortPresenter = null;
   #sortModel = null;
+  #filterModel = null;
   #newPoint = null;
+  #filtersPresenter = null;
+  #filterConteiner = null;
+  #currentSortType = SortType.DAY;
 
-  constructor({listContainer, pointsModel, offersModel, destinationsModel}){
+  constructor({listContainer, pointsModel, offersModel, destinationsModel, filterConteiner}){
     this.#listContainer = listContainer;
     this.#pointsModel = pointsModel;
     this.#offersModel = offersModel;
     this.#destinationsModel = destinationsModel;
     this.#sortModel = new SortModel();
+    this.#filterModel = new FilterModel();
+    this.#filterConteiner = filterConteiner;
 
     this.#pointsModel.addObserver(this.#handelModelEvent);
     this.#sortModel.addObserver(this.#handelModelEvent);
+    this.#filterModel.addObserver(this.#handelModelEvent);
 
     this.#sortPresenter = new SortPresenter({
       listContainer,
@@ -40,7 +51,18 @@ export default class EventPresenter {
   }
 
   get point(){
-    return this.#pointsModel.get();
+    const filterType = this.#filterModel.filter;
+    const filteredPoints = filter[filterType](this.#pointsModel.get());
+    return sort[this.#currentSortType](filteredPoints);
+  }
+
+  #createFiltersPresenter(){
+    this.#filtersPresenter = new FilterPresenter({
+      pointsModel : this.#pointsModel,
+      filterConteiner : this.#filterConteiner,
+      filterModel : this.#filterModel
+    });
+    this.#filtersPresenter.init();
   }
 
   #addNewPoint = () => {
@@ -59,7 +81,6 @@ export default class EventPresenter {
   }
 
   #handelViewAction = (actionType, updateType, updatePoint) => {
-    console.log(actionType, updateType, updatePoint)
     switch (actionType) {
       case UserAction.UPDATE_POINT:
         this.#pointsModel.updatePoint(updateType, updatePoint);
@@ -116,14 +137,16 @@ export default class EventPresenter {
   #clearPoints = (resetSortType = false) => {
     this.#pointPresenters.forEach((presenter) => {
       presenter.destroy();
+      this.#filtersPresenter.destroy();
     });
     this.#pointPresenters.clear();
     if(resetSortType) {
-      console.log(this.#sortModel);
+      this.#currentSortType = SortType.DAY;
     }
   };
 
   init() {
+    this.#createFiltersPresenter();
     this.#hendelNewPoint();
     const pointsData = [...this.point];
     if (pointsData.length) {

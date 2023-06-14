@@ -1,24 +1,68 @@
 import FilterView from '../view/filters-view.js';
 
-import { generateFilters } from '../model/filter.js';
-import { render } from '../framework/render.js';
-
+import { filter } from '../utils/filter.js';
+import { render, replace, remove } from '../framework/render.js';
+import { UpdateType, FilterType } from '../const.js';
 
 export default class FilterPresenter{
 
-  #pointModel = null;
   #filterConteiner = null;
-  #filters = [];
+  #filterComponent = null;
 
-  constructor (pointModel,filterConteiner){
-    this.#pointModel = pointModel;
+  #pointsModel = null;
+  #filterModel = null;
+
+  #currentFilterType = null;
+
+  constructor ({pointsModel,filterConteiner, filterModel}){
+    this.#pointsModel = pointsModel;
     this.#filterConteiner = filterConteiner;
-
-    this.#filters = generateFilters(this.#pointModel.get());
+    this.#filterModel = filterModel;
+    this.#pointsModel.addObserver(this.#modelEventHandler);
+    this.#filterModel.addObserver(this.#modelEventHandler);
   }
 
+  get filters() {
+    const points = this.#pointsModel.get();
+
+    return Object.values(FilterType).map((type) => ({
+      type,
+      disabled: !filter[type](points).length
+    }));
+
+  }
+
+
   init(){
-    render(new FilterView(this.#filters), this.#filterConteiner);
+    this.#currentFilterType = this.#filterModel.filter;
+    const prevFilterComponent = this.#filterComponent;
+    this.#filterComponent = new FilterView({
+      filters : this.filters,
+      currentFilterType : this.#currentFilterType,
+      onFilterChange : this.#filterTypeChangeHandler
+    });
+
+    if(prevFilterComponent === null) {
+      render(this.#filterComponent, this.#filterConteiner);
+      return;
+    }
+
+    replace(this.#filterComponent, prevFilterComponent);
+    remove(prevFilterComponent);
+  }
+
+  #modelEventHandler = () => {
+    this.init();
+  };
+
+  #filterTypeChangeHandler = (filterType) => {
+    if(this.#filterModel.filter !== filterType) {
+      this.#filterModel.setFilter(UpdateType.MAJOR, filterType);
+    }
+  };
+
+  destroy(){
+    remove(this.#filterComponent);
   }
 
 }
