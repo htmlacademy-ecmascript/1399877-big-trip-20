@@ -61,7 +61,20 @@ function getPointsPriceDateDifference (pointA, pointB){
   return pointB.basePrice - pointA.basePrice;
 }
 
+const getPointTemplate = () => ({
+  id : crypto.randomUUID(),
+  basePrice : '',
+  dateFrom : '',
+  dateTo : '',
+  destination : '',
+  isFavorite : false,
+  offers: '',
+  type : '',
+});
+
+
 export{
+  getPointTemplate,
   getRandomInteger,
   getRandomValue,
   formatStringToDateTime,
@@ -73,5 +86,5 @@ export{
   isPointPast,
   getPointsDateDifference,
   getPointsDurationDateDifference,
-  getPointsPriceDateDifference,
+  getPointsPriceDateDifference
 };

@@ -1,19 +1,19 @@
-import AbstractView from '../framework/view/abstract-view.js';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
+import { FilterType } from '../const.js';
 
-function createFilterItem(filter, currentFilterType) {
-  const {type, disabled } = filter;
+function createFilterItem(type, currentFilterType) {
   return (
     `<div class="trip-filters__filter">
       <input id="filter-${type}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${type}"
-      ${type === currentFilterType ? 'checked' : ''} ${disabled ? 'disabled' : ''}>
+      ${type === currentFilterType ? 'checked' : ''}>
       <label class="trip-filters__filter-label" for="filter-${type}">${type}</label>
     </div>`
   );
 }
 
-function createFiltersTemplate(filters, currentFilterType){
-  const filterItemsTemplate = filters
-    .map((filter) => createFilterItem(filter, currentFilterType)).join('');
+function createFiltersTemplate(currentFilterType){
+  const filterItemsTemplate = Object.values(FilterType)
+    .map((type) => createFilterItem(type, currentFilterType)).join('');
   return (
     `<form class="trip-filters" action="#" method="get">
         ${filterItemsTemplate}
@@ -23,23 +23,27 @@ function createFiltersTemplate(filters, currentFilterType){
 }
 
 
-export default class FilterView extends AbstractView{
+export default class FilterView extends AbstractStatefulView {
 
-  #filters = null;
-  #currentFilterType = null;
   #handleFilterTypeChancge = null;
 
-  constructor({filters, currentFilterType, onFilterChange}){
+  constructor({currentFilterType, onFilterChange}){
     super();
-    this.#filters = filters;
-    this.#currentFilterType = currentFilterType;
     this.#handleFilterTypeChancge = onFilterChange;
 
-    this.element.addEventListener('change', this.#filterTypeChangeHandler);
+    this._setState({
+      currentFilterType
+    });
+
+    this._restoreHandlers();
   }
 
   get template() {
-    return createFiltersTemplate(this.#filters, this.#currentFilterType);
+    return createFiltersTemplate(this._state);
+  }
+
+  _restoreHandlers() {
+    this.element.addEventListener('change', this.#filterTypeChangeHandler);
   }
 
   #filterTypeChangeHandler = (evt) => {

@@ -44,19 +44,20 @@ const UpdateType = {
   PATCH : 'PATCH',
   MINOR : 'MINOR',
   MAJOR : 'MAJOR',
-};
-
-const templatePoint = {
-  id : crypto.randomUUID(),
-  basePrice : '',
-  dateFrom : '',
-  dateTo : '',
-  destination : '',
-  isFavorite : false,
-  offers: '',
-  type : '',
-
+  INIT : 'INIT'
 };
 
 
-export {TYPES, FilterType, SortType, enabledSortType, UpdateType, UserAction, templatePoint};
+const PointMode = {
+  VIEW: 'view',
+  EDIT: 'edit',
+};
+
+const Method = {
+  PUT : 'put',
+  POST : 'post',
+  DELETE : 'delete'
+};
+
+
+export {TYPES, FilterType, SortType, enabledSortType, UpdateType, UserAction, PointMode, Method};

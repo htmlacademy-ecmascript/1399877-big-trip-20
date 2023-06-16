@@ -1,11 +1,11 @@
 export default class OfferModel{
 
-  #offers = null;
+  #offers = [];
   #service = null;
 
   constructor(service){
     this.#service = service;
-    this.#offers = this.#service.getOffers();
+    // this.#offers = this.#service.getOffers();
   }
 
   get(){
@@ -16,11 +16,9 @@ export default class OfferModel{
     return this.#offers.find((offer)=> offer.type === type);
   }
 
-  updateOffer(updatedOffer) {
-    this.#offers.find((offer) => {
-      if(offer.id === updatedOffer.id) {
-        Object.assign(offer, updatedOffer);
-      }
-    });
+  async init() {
+    this.#offers = await this.#service.getOffers();
+    return this.#offers;
   }
+
 }

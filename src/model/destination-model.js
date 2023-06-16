@@ -1,30 +1,27 @@
 export default class DestinationsModel{
 
-  #destination = null;
+  #destinations = [];
   #service = null;
   constructor(service){
     this.#service = service;
-    this.#destination = this.#service.getDestinations();
+    // this.#destinations = this.#service.getDestinations();
   }
 
   get(){
-    return this.#destination;
+    return this.#destinations;
   }
 
   getById(idDestination){
-    return this.#destination.find((element)=> {
+    return this.#destinations.find((element)=> {
       if(idDestination === element.id){
         return element;
       }
     });
   }
 
-  updateDestination(updatedDestination) {
-    this.#destination.find((destination) => {
-      if(destination.id === updatedDestination.id) {
-        Object.assign(destination, updatedDestination);
-      }
-    });
+  async init() {
+    this.#destinations = await this.#service.getDestinations();
+    return this.#destinations;
   }
 
 }

@@ -227,7 +227,8 @@ export default class EventEdit extends AbstractStatefulView {
         dateFrom : userDate
       }
     });
-    this.#datepickerFrom.set('minDate', this._state.point.dateFrom);
+    this.#datepickerFrom.set('maxDate', this._state.point.dateTo);
+    console.log(this.#datepickerFrom.maxDate)
   };
 
   #dateToChangeHandler = ([userDate]) => {
@@ -237,7 +238,7 @@ export default class EventEdit extends AbstractStatefulView {
         dateTo : userDate
       }
     });
-    this.#datepickerTo.set('maxDate', this._state.point.dateTo);
+    this.#datepickerTo.set('minDate', this._state.point.dateFrom);
   };
 
   #setDatapickers = () => {
@@ -247,10 +248,10 @@ export default class EventEdit extends AbstractStatefulView {
     this.#datepickerFrom = flatpickr(
       dateFromElement,
       {
+        enableTime: true,
         dateFormat : 'd/m/y H:i',
         defaultDate : this._state.point.dateFrom,
         onClose : this.#dateFromChangeHandler,
-        enableTime : true,
         locale: {
           firstDayOfWeek : 1,
         },

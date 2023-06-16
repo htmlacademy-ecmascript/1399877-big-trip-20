@@ -1,15 +1,14 @@
-import { render} from '../framework/render.js';
+import { render, remove} from '../framework/render.js';
 import ListEmpty from '../view/list-empty.js';
 import PointPresenter from './point-presenter.js';
 import SortPresenter from './sort-presenter.js';
 import EventsListView from '../view/events-list-view.js';
-import { UserAction, UpdateType, templatePoint, SortType } from '../const.js';
+import { UserAction, UpdateType, SortType, FilterType } from '../const.js';
 import SortModel from '../model/sortModel.js';
 import AddPointPresenter from './add-point-presenter.js';
 import FilterPresenter from './filter-presenter.js';
 import FilterModel from '../model/filter-model.js';
-import { filter } from '../utils/filter.js';
-import { sort } from '../utils/sort.js';
+
 
 export default class EventPresenter {
   #eventsListView = new EventsListView();
@@ -27,9 +26,11 @@ export default class EventPresenter {
   #sortModel = null;
   #filterModel = null;
   #newPoint = null;
+  #emptyListView = null;
   #filtersPresenter = null;
   #filterConteiner = null;
   #currentSortType = SortType.DAY;
+  #isLoading = true;
 
   constructor({listContainer, pointsModel, offersModel, destinationsModel, filterConteiner}){
     this.#listContainer = listContainer;
@@ -48,30 +49,32 @@ export default class EventPresenter {
       listContainer,
       sortModel : this.#sortModel
     });
+
+    this.#createFiltersPresenter();
+    this.#hendelNewPoint();
   }
 
-  get point(){
-    const filterType = this.#filterModel.filter;
-    const filteredPoints = filter[filterType](this.#pointsModel.get());
-    return sort[this.#currentSortType](filteredPoints);
+  get points(){
+    const filteredPoints = this.#filtersPresenter.filterePoints(this.#pointsModel.get());
+    const sortedPoints = this.#sortPresenter.sortPoints(filteredPoints);
+    return sortedPoints;
   }
 
   #createFiltersPresenter(){
     this.#filtersPresenter = new FilterPresenter({
-      pointsModel : this.#pointsModel,
       filterConteiner : this.#filterConteiner,
       filterModel : this.#filterModel
     });
-    this.#filtersPresenter.init();
   }
 
   #addNewPoint = () => {
+    this.#clearEmptyList();
     this.#newPoint = new AddPointPresenter({
-      point : templatePoint,
       offers : this.#offersModel,
       destinations : this.#destinationsModel,
-      listContainer : this.#listContainer,
-      onDataChange: this.#handelViewAction
+      eventsListView: this.#eventsListView,
+      onDataChange: this.#handelViewAction,
+      onCancel : () => this.init()
     });
     this.#newPoint.init();
   };
@@ -96,15 +99,20 @@ export default class EventPresenter {
 
   #handelModelEvent = (updateType, point) => {
     switch(updateType) {
-      case UpdateType.PATCH:
+      case UpdateType.PATCH :
         this.#pointPresenters.get(point.id).init(point);
         break;
-      case UpdateType.MINOR:
+      case UpdateType.MINOR :
         this.#clearPoints();
         this.init();
         break;
-      case UpdateType.MAJOR:
+      case UpdateType.MAJOR :
         this.#clearPoints({resetSortType : true});
+        this.init();
+        break;
+      case UpdateType.INIT :
+        this.#isLoading = false;
+        this.#clearPoints();
         this.init();
         break;
     }
@@ -137,25 +145,49 @@ export default class EventPresenter {
   #clearPoints = (resetSortType = false) => {
     this.#pointPresenters.forEach((presenter) => {
       presenter.destroy();
-      this.#filtersPresenter.destroy();
     });
     this.#pointPresenters.clear();
+
     if(resetSortType) {
-      this.#currentSortType = SortType.DAY;
+      this.#sortModel.resetType();
     }
   };
 
+  #clearEmptyList() {
+    if(this.#emptyListView) {
+      remove(this.#emptyListView);
+    }
+  }
+
+  #renderEmptyList() {
+    const text = (() => {
+      switch (this.#filterModel.filter) {
+        case FilterType.EVERYTHING :
+          return 'Click New Event to create your first point';
+        case FilterType.FUTURE :
+          return 'There are no future events now';
+        case FilterType.PAST :
+          return 'Thre are no past events now';
+        case FilterType.PRESENT :
+          return 'Thre ara no present events now';
+      }
+    })();
+
+    this.#emptyListView = new ListEmpty({text});
+    render(this.#emptyListView, this.#listContainer);
+  }
+
   init() {
-    this.#createFiltersPresenter();
-    this.#hendelNewPoint();
-    const pointsData = [...this.point];
-    if (pointsData.length) {
-      const sortedPoints = this.#sortPresenter.sortPoints(pointsData);
+    this.#filtersPresenter.init();
+    const points = [...this.points];
+    this.#clearEmptyList();
+
+    if(points.length) {
       this.#sortPresenter.init();
       render(this.#eventsListView, this.#listContainer);
-      sortedPoints.forEach((point) => this.#renderPoint(point));
+      points.forEach((point) => this.#renderPoint(point));
     } else {
-      render(new ListEmpty, this.#listContainer);
+      this.#renderEmptyList();
     }
   }
 }

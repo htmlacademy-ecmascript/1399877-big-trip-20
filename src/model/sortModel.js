@@ -12,4 +12,9 @@ export default class SortModel extends Observable {
     this.#type = type;
     this._notify(updateType, type);
   }
+
+  resetType(){
+    this.#type = SortType.DAY;
+  }
+
 }

@@ -2,12 +2,7 @@ import { render, replace, remove } from '../framework/render.js';
 import EventsView from '../view/event-view.js';
 import EventEdit from '../view/event-edit.js';
 import {UpdateType, UserAction} from '../const.js';
-
-
-const PointMode = {
-  VIEW: 'view',
-  EDIT: 'edit',
-};
+import {PointMode} from '../const.js';
 
 export default class PointPresenter{
 
@@ -17,11 +12,9 @@ export default class PointPresenter{
   #pointData = null;
   #pointViewComponent = null;
   #pointEditComponent = null;
-  #newPoint = null;
   #handleEditModeChange = null;
   #handleDataChange = null;
   #mode = PointMode.VIEW;
-  #onDeleteClick = null;
 
   constructor({eventsListView, offersModel, destinationsModel, onDataChange}) {
     this.#eventsListView = eventsListView;
