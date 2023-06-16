@@ -32,5 +32,6 @@ const eventPresenter = new EventPresenter({
 render(new InfoView(), document.querySelector('.trip-main'), RenderPosition.AFTERBEGIN);
 
 eventPresenter.init();
+pointsModel.init();
 
 

@@ -52,7 +52,8 @@ export default class PointPresenter{
       destinations : this.#destinationsModel.get(),
       offers : this.#offersModel.get(),
       onSave : this.#handlerPointSubmit,
-      onDelete : this.#handelDeleteClick
+      onDelete : this.#handelDeleteClick,
+      handelCansel : this.closeEditMode
     });
 
     pointEdit.setCancelHandler(this.closeEditMode);

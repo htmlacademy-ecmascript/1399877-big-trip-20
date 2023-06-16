@@ -79,6 +79,7 @@ function createItemEvent(data){
 
       <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
       <button class="event__reset-btn" type="reset">Delete</button>
+      <button class="event__rollup-btn" type="button">
     </header>
     <section class="event__details">
     <section class="event__section  event__section--offers">
@@ -114,13 +115,13 @@ export default class EventEdit extends AbstractStatefulView {
   #datepickerTo = null;
   #handelDeleteClick = null;
 
-  constructor({point, destinations, offers, onSave, onDelete}){
+  constructor({point, destinations, offers, onSave, onDelete, handelCansel}){
     super();
     this.#destinations = destinations;
     this.#offers = offers;
 
     this.#handelSave = onSave;
-
+    this.#handelCansel = handelCansel;
     this._setState(EventEdit.parsePointToState({point}));
     this.#handelDeleteClick = onDelete;
 
@@ -140,10 +141,11 @@ export default class EventEdit extends AbstractStatefulView {
     this.#handelSave(EventEdit.parseStateToPoint(this._state));
   };
 
-  #resetButtonClickHandler = (evt) => {
+  #onCancelButtonClick = (evt) => {
     evt.preventDefault();
     this.#handelCansel();
   };
+
 
   setCancelHandler(cb) {
     this.#handelCansel = cb;
@@ -191,11 +193,12 @@ export default class EventEdit extends AbstractStatefulView {
   _restoreHandlers(){
     this.element.querySelector('form').addEventListener('submit', this.#formSubmitHandler);
     this.element.querySelector('.event__reset-btn').addEventListener('click', this.#formDeleteClickHandler);
-
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#onCancelButtonClick);
     this.element.querySelector('.event__type-group').addEventListener('change', this.#typeChangeHandler);
     this.element.querySelector('.event__input--destination').addEventListener('change', this.#destinationListChangeHandler);
     this.element.querySelector('.event__input--price').addEventListener('change', this.#PriceChangeHandler);
     this.element.querySelector('.event__section--offers').addEventListener('change', this.#offerClickHandler);
+
 
     this.#setDatapickers();
 
@@ -206,40 +209,19 @@ export default class EventEdit extends AbstractStatefulView {
     this.#handelDeleteClick(EventEdit.parseStateToPoint(this._state));
   };
 
-  removeElement = () => {
-    super.removeElement();
 
-    if(this.#datepickerFrom){
-      this.#datepickerFrom.destroy();
-      this.#datepickerFrom = null;
-    }
-
-    if(this.#datepickerTo){
-      this.#datepickerTo.destroy();
-      this.#datepickerTo = null;
-    }
-  };
-
-  #dateFromChangeHandler = ([userDate]) => {
-    this._setState({
-      point : {
-        ...this._state.point,
-        dateFrom : userDate
-      }
+  #dateFromChangeHandler = ([dateFrom]) => {
+    this.updateElement({
+      dateFrom: dateFrom,
     });
-    this.#datepickerFrom.set('maxDate', this._state.point.dateTo);
-    console.log(this.#datepickerFrom.maxDate)
   };
 
-  #dateToChangeHandler = ([userDate]) => {
-    this._setState({
-      point : {
-        ...this._state.point,
-        dateTo : userDate
-      }
+  #dateToChangeHandler = ([dateTo]) => {
+    this.updateElement({
+      dateTo: dateTo,
     });
-    this.#datepickerTo.set('minDate', this._state.point.dateFrom);
   };
+
 
   #setDatapickers = () => {
 
@@ -249,32 +231,45 @@ export default class EventEdit extends AbstractStatefulView {
       dateFromElement,
       {
         enableTime: true,
-        dateFormat : 'd/m/y H:i',
-        defaultDate : this._state.point.dateFrom,
-        onClose : this.#dateFromChangeHandler,
+        'time_24hr': true,
+        dateFormat: 'd/m/y H:i',
+        maxDate: this._state.dateTo,
         locale: {
-          firstDayOfWeek : 1,
+          firstDayOfWeek: 1
         },
-        'time_24hr' : true
-      },
+        onChange: this.#dateFromChangeHandler,
+      }
     );
 
 
     this.#datepickerTo = flatpickr(
       dateToElement,
       {
-        dateFormat : 'd/m/y H:i',
-        defaultDate : this._state.point.dateTo,
-        onClose : this.#dateToChangeHandler,
-        enableTime : true,
+        enableTime: true,
+        'time_24hr': true,
+        dateFormat: 'd/m/y H:i',
+        minDate: this._state.dateFrom,
         locale: {
-          firstDayOfWeek : 1,
+          firstDayOfWeek: 1
         },
-        'time_24hr' : true
-      },
+        onChange: this.#dateToChangeHandler,
+      }
     );
 
   };
+
+  removeElement() {
+    super.removeElement();
+
+    if (this.#datepickerFrom && this.#datepickerTo) {
+      this.#datepickerFrom.destroy();
+      this.#datepickerTo.destroy();
+
+      this.#datepickerFrom = null;
+      this.#datepickerTo = null;
+    }
+  }
+
 
   static parsePointToState = (data) => ({...data});
 

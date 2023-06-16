@@ -55,7 +55,7 @@ export default class EventPresenter {
   }
 
   get points(){
-    const filteredPoints = this.#filtersPresenter.filterePoints(this.#pointsModel.get());
+    const filteredPoints = this.#filtersPresenter.filterePoints(this.#pointsModel.points);
     const sortedPoints = this.#sortPresenter.sortPoints(filteredPoints);
     return sortedPoints;
   }
