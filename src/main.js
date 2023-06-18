@@ -47,6 +47,9 @@ function handleNewPointButtonClick(){
 render(new InfoView(), mainContainer, RenderPosition.AFTERBEGIN);
 
 eventPresenter.init();
-pointsModel.init();
+pointsModel.init()
+  .finally(() => {
+    render(newPointButtonComponent, mainContainer);
+  });
 
 

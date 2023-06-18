@@ -8,7 +8,7 @@ export default class OfferModel{
     // this.#offers = this.#service.getOffers();
   }
 
-  get(){
+  get offers(){
     return this.#offers;
   }
 

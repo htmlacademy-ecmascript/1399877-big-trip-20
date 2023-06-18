@@ -7,27 +7,33 @@ export default class NewPointPresenter {
   #pointListContainer = null;
   #handlePointChange = null;
   #handleDestroy = null;
+  #destinationsModel = null;
+  #offersMolel = null;
 
   #pointEditComponent = null;
 
-  constructor({pointListContainer, onPointChange, onDestroy}) {
+  constructor({pointListContainer, offersMolel, destinationsModel, onPointChange, onDestroy}) {
     this.#pointListContainer = pointListContainer;
+
+    this.#offersMolel = offersMolel;
+    this.#destinationsModel = destinationsModel;
+
     this.#handlePointChange = onPointChange;
     this.#handleDestroy = onDestroy;
 
   }
 
-  init({destinations, offers}) {
+  init() {
     if (this.#pointEditComponent !== null) {
       return;
     }
 
     this.#pointEditComponent = new EventEdit({
-      destinations,
-      offers,
-      onEditFormSubmit: this.#editFormSubmit,
-      onEditFormDelete: this.#editFormDelete,
-      isNew: true,
+      destinations : this.#destinationsModel,
+      offers : this.#offersMolel,
+      onEditFormSubmit : this.#editFormSubmit,
+      onEditFormDelete : this.#editFormDelete,
+      isNew : true,
     });
 
     render(this.#pointEditComponent, this.#pointListContainer, RenderPosition.AFTERBEGIN);

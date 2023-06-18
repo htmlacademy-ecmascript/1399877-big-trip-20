@@ -65,7 +65,9 @@ export default class EventPresenter {
     });
 
     this.#newPointPresenter = new NewPointPresenter({
-      pointListContainer: this.#listContainer.element,
+      offersModel: this.#offersModel.offers,
+      destinationsModel: this.#destinationsModel.destinations,
+      pointListContainer: this.#listContainer,
       onPointChange: this.#handelViewAction,
       onDestroy: onNewPointDestroy,
 
@@ -77,6 +79,13 @@ export default class EventPresenter {
     const filteredPoints = this.#filtersPresenter.filterePoints(this.#pointsModel.points);
     const sortedPoints = this.#sortPresenter.sortPoints(filteredPoints);
     return sortedPoints;
+  }
+
+  createPoint(){
+    this.#currentSortType = SortType.DAY;
+    this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
+    this.#newPointPresenter.init({destinations: this.destinations, offers: this.offers});
+
   }
 
   #createFiltersPresenter(){
@@ -171,6 +180,7 @@ export default class EventPresenter {
   }
 
   #clearPoints = (resetSortType = false) => {
+    this.#newPointPresenter.destroy();
     this.#pointPresenters.forEach((presenter) => {
       presenter.destroy();
     });
@@ -180,12 +190,6 @@ export default class EventPresenter {
       this.#sortModel.resetType();
     }
   };
-
-  createPoint(){
-    this.#currentSortType = SortType.DAY;
-    this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
-    this.#newPointPresenter.init({destinations: this.destinations, offers: this.offers});
-  }
 
 
   #clearEmptyList() {

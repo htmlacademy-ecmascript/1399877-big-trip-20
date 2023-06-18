@@ -72,6 +72,7 @@ const createDestinationTemplate = (destinationItem) => {
 };
 
 const createPointEditTemplate = (data) => {
+  console.log(data)
 
   const {point, destinations , offers, isNew, isDisabled, isSaving, isDeleting} = data;
   const currentDestination = destinations.find((destination) => destination.id === point.destination);
