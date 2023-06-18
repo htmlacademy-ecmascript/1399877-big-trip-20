@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 
 const TYPES = [
   'taxi',
@@ -59,5 +60,40 @@ const Method = {
   DELETE : 'delete'
 };
 
+const DateFormat = {
+  EVENT_DATE: 'MMM D',
+  SHORT_EVENT_DATE: 'D',
+  EVENT_EDIT_DATE: 'DD/MM/YY HH:mm',
+  TIME: 'HH:mm',
+  D_H_M_DURATION: 'DD[D] HH[H] mm[M]',
+  H_M_DURATION: 'HH[H] mm[M]',
+  M_DURATION: 'mm[M]'
+};
 
-export {TYPES, FilterType, SortType, enabledSortType, UpdateType, UserAction, PointMode, Method};
+const BLANK_POINT = {
+  basePrice: 0,
+  dateFrom: dayjs().toISOString(),
+  dateTo: dayjs().add(2, 'D').toISOString(),
+  isFavorite: false,
+  offers: [],
+  type: TYPES[0]
+};
+
+const TimeLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000
+};
+
+export {
+  TYPES,
+  FilterType,
+  SortType,
+  enabledSortType,
+  UpdateType,
+  UserAction,
+  PointMode,
+  Method,
+  DateFormat,
+  BLANK_POINT,
+  TimeLimit
+};

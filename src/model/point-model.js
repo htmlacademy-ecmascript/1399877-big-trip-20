@@ -56,13 +56,11 @@ export default class PointModel extends Observable{
   async addPoint(updateType, update) {
     try {
       const response = await this.#service.addPoint(update);
-      const updatedPoint = this.#adaptToClient(response);
+      const newPoint = this.#adaptToClient(response);
 
-      this.#points = [
-        updatedPoint,
-        ...this.#points,
-      ];
-      this._notify(updateType, updatedPoint);
+      this.#points = [newPoint, ...this.#points];
+      this._notify(updateType, update);
+
 
     } catch(err) {
       throw new Error('Can\'t add point');

@@ -30,6 +30,7 @@ export default class PointPresenter{
       UpdateType.MINOR,
       point,
     );
+    document.removeEventListener('keydown', this.escKeyDownHandler);
   };
 
 
@@ -51,6 +52,7 @@ export default class PointPresenter{
       point,
       destinations : this.#destinationsModel.get(),
       offers : this.#offersModel.get(),
+
       onSave : this.#handlerPointSubmit,
       onDelete : this.#handelDeleteClick,
       handelCansel : this.closeEditMode
@@ -103,6 +105,49 @@ export default class PointPresenter{
       document.removeEventListener('keydown', this.escKeyDownHandler);
     }
   };
+
+  resetView() {
+    if (this.#mode !== this.#mode.VIEW) {
+      this.#createEditModeComponent.reset(this.#pointData);
+      this.#renderEditMode();
+    }
+  }
+
+  setSaving() {
+    if (this.#mode === this.#mode.EDITING) {
+      this.#pointEditComponent.updateElement({
+        isDisabled: true,
+        isSaving: true
+      });
+    }
+  }
+
+  setDeleting() {
+    if (this.#mode === this.#mode.EDITING){
+      this.#pointEditComponent.updateElement({
+        isDisabled: true,
+        isDeleting: true
+      });
+    }
+  }
+
+  setAborting() {
+    if (this.#mode === this.#mode.VIEW) {
+      this.#pointViewComponent.shake();
+      return;
+    }
+
+    const resetFormState = () => {
+      this.#pointEditComponent.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false
+      });
+    };
+
+    this.#pointEditComponent.shake(resetFormState);
+  }
+
 
   escKeyDownHandler = (evt) => {
     if(evt.key === 'Escape'){
