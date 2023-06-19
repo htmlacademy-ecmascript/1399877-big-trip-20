@@ -50,7 +50,7 @@ export default class PointPresenter{
   #createEditModeComponent(point) {
     const pointEdit = new EventEdit ({
       point,
-      destinations : this.#destinationsModel.destinationsModel,
+      destinations : this.#destinationsModel.destinations,
       offers : this.#offersModel.offers,
 
       onSave : this.#handlerPointSubmit,

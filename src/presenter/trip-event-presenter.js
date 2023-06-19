@@ -67,7 +67,7 @@ export default class EventPresenter {
     this.#newPointPresenter = new NewPointPresenter({
       offersModel: this.#offersModel,
       destinationsModel: this.#destinationsModel,
-      pointListContainer: this.#listContainer,
+      pointListContainer: this.#eventsListView.element,
       onPointChange: this.#handelViewAction,
       onDestroy: onNewPointDestroy,
 

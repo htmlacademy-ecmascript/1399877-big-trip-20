@@ -72,7 +72,6 @@ const createDestinationTemplate = (destinationItem) => {
 };
 
 const createPointEditTemplate = (data) => {
-  console.log(data)
 
   const {point, destinations , offers, isNew, isDisabled, isSaving, isDeleting} = data;
   const currentDestination = destinations.find((destination) => destination.id === point.destination);
@@ -87,20 +86,20 @@ const createPointEditTemplate = (data) => {
   const currentOffers = offers.find((offer) => offer.type === point.type)?.offers ?? [];
 
   const typeList = (type) => TYPES.map((typeEvent) => {
-    const isChecked = typeEvent.toLowerCase() === type ? 'checked' : '';
+    const isChecked = typeEvent === type ? 'checked' : '';
 
     return (`
         <div class="event__type-item">
           <input
-            id="event-type-${typeEvent.toLowerCase()}-1"
+            id="event-type-${typeEvent}-1"
             class="event__type-input  visually-hidden"
             type="radio"
             name="event-type"
-            value="${typeEvent.toLowerCase()}" ${isChecked}
+            value="${typeEvent}" ${isChecked}
           >
           <label
-            class="event__type-label event__type-label--${typeEvent.toLowerCase()}"
-            for="event-type-${typeEvent.toLowerCase()}-1">${typeEvent}
+            class="event__type-label event__type-label--${typeEvent}"
+            for="event-type-${typeEvent}-1">${typeEvent}
           </label>
         </div>`);
   }).join('');
@@ -111,7 +110,7 @@ const createPointEditTemplate = (data) => {
         <div class="event__type-wrapper">
           <label class="event__type  event__type-btn" for="event-type-toggle-1">
             <span class="visually-hidden">Choose event type</span>
-            <img class="event__type-icon" width="17" height="17" src="img/icons/${point.type.toLowerCase()}.png" alt="Event type icon">
+            <img class="event__type-icon" width="17" height="17" src="img/icons/${point.type}.png" alt="Event type icon">
           </label>
           <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox" ${isDisabled ? 'disabled' : ''}>
 
@@ -146,7 +145,7 @@ const createPointEditTemplate = (data) => {
             <span class="visually-hidden">Price</span>
             &euro;
           </label>
-          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${`${point.basePrice}`}" ${isDisabled ? 'disabled' : ''}>
+          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${point.basePrice}" ${isDisabled ? 'disabled' : ''}>
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? 'disabled' : ''}>${isSaving ? 'Saving...' : 'Save'}</button>
@@ -223,7 +222,10 @@ export default class EventEdit extends AbstractStatefulView {
   #priceChangeHandler = (evt) => {
     evt.preventDefault();
     this._setState({
-      basePrice: Number(evt.target.value),
+      point: {
+        ...this._state.point,
+        basePrice: Number(evt.target.value),
+      }
     });
   };
 
@@ -262,7 +264,7 @@ export default class EventEdit extends AbstractStatefulView {
     this._setState({
       point : {
         ...this._state.point,
-        offers : checkedBoxes.map((element) => element.id)
+        offers : checkedBoxes.map((element) => element.value)
       }
     });
   };
@@ -273,9 +275,13 @@ export default class EventEdit extends AbstractStatefulView {
     }
 
     const selectedDestination = this.#destinations.find((destination) => destination.name === evt.target.value);
+
     if (selectedDestination) {
       this.updateElement({
-        destination: selectedDestination.id,
+        point: {
+          ...this._state.point,
+          destination: selectedDestination.id,
+        }
       });
     }
   };
@@ -299,7 +305,7 @@ export default class EventEdit extends AbstractStatefulView {
 
     this.element.querySelector('.event__input--price').addEventListener('input', this.#priceChangeHandler);
 
-    this.element.querySelector('.event__section--offers').addEventListener('change', this.#offerClickHandler);
+    this.element.querySelector('.event__section--offers')?.addEventListener('change', this.#offerClickHandler);
 
 
     this.#setDatepickerFrom();
@@ -319,14 +325,25 @@ export default class EventEdit extends AbstractStatefulView {
 
 
   #dateFromChangeHandler = ([userDate]) => {
+    let dateTo = this._state.point.dateTo;
+    if (new Date(dateTo) < new Date(userDate)) {
+      dateTo = userDate;
+    }
     this.updateElement({
-      dateFrom: userDate,
+      point: {
+        ...this._state.point,
+        dateFrom: userDate,
+        dateTo
+      }
     });
   };
 
   #dateToChangeHandler = ([userDate]) => {
     this.updateElement({
-      dateTo: userDate,
+      point: {
+        ...this._state.point,
+        dateTo: userDate,
+      }
     });
   };
 
@@ -337,8 +354,7 @@ export default class EventEdit extends AbstractStatefulView {
         enableTime: true,
         dateFormat: 'd/m/y H:i',
         minDate: 'today',
-        maxDate: this._state.dateTo,
-        defaultDate: this._state.dateFrom,
+        defaultDate: this._state.point.dateFrom,
         onChange: this.#dateFromChangeHandler,
         'time_24hr': true,
       },
@@ -351,8 +367,8 @@ export default class EventEdit extends AbstractStatefulView {
       {
         enableTime: true,
         dateFormat: 'd/m/y H:i',
-        minDate: this._state.dateFrom,
-        defaultDate: this._state.dateTo,
+        minDate: this._state.point.dateFrom,
+        defaultDate: this._state.point.dateTo,
         onChange: this.#dateToChangeHandler,
         'time_24hr': true,
       },
@@ -368,13 +384,11 @@ export default class EventEdit extends AbstractStatefulView {
     });
 
   static parseStateToPoint = (state) => {
-    const point = {...state};
+    delete state.isDisabled;
+    delete state.isSaving;
+    delete state.isDeleting;
 
-    delete point.isDisabled;
-    delete point.isSaving;
-    delete point.isDeleting;
-
-    return point;
+    return state.point;
   };
 }
 

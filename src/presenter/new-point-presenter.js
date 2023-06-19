@@ -8,15 +8,15 @@ export default class NewPointPresenter {
   #handlePointChange = null;
   #handleDestroy = null;
   #destinationsModel = null;
-  #offersMolel = null;
+  #offersModel = null;
 
   #pointEditComponent = null;
 
   constructor({pointListContainer, offersModel, destinationsModel, onPointChange, onDestroy}) {
     this.#pointListContainer = pointListContainer;
 
-    this.#offersMolel = offersModel.offers;
-    this.#destinationsModel = destinationsModel.destinations;
+    this.#offersModel = offersModel;
+    this.#destinationsModel = destinationsModel;
 
     this.#handlePointChange = onPointChange;
     this.#handleDestroy = onDestroy;
@@ -29,8 +29,8 @@ export default class NewPointPresenter {
     }
 
     this.#pointEditComponent = new EventEdit({
-      destinations : this.#destinationsModel,
-      offers : this.#offersMolel,
+      destinations : this.#destinationsModel.destinations,
+      offers : this.#offersModel.offers,
       onEditFormSubmit : this.#editFormSubmit,
       onEditFormDelete : this.#editFormDelete,
       isNew : true,
@@ -76,7 +76,7 @@ export default class NewPointPresenter {
   #editFormSubmit = (point) => {
     this.#handlePointChange(
       UserAction.ADD_POINT,
-      UpdateType.MINOR,
+      UpdateType.MAJOR,
       point,
     );
   };
