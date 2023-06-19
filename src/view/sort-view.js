@@ -1,4 +1,4 @@
-import AbstractView from '../framework/view/abstract-view.js';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { enabledSortType } from '../const.js';
 import { SortType } from '../const.js';
 
@@ -23,44 +23,50 @@ function getSortItem(sortItem) {
 </div>`;
 }
 
-function createSortTemplate({sortMap}){
+function createSortTemplate({sortType}){
+  const sortMap = Object.values(SortType)
+    .map((type) => ({
+      type,
+      isChecked: (type === sortType),
+      isDisabled: (!enabledSortType[type])
+    }));
   return(`<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
     ${sortMap.map((sortItem) => getSortItem(sortItem)).join('')}
   </form>`);
 }
 
-export default class SortView extends AbstractView{
+export default class SortView extends AbstractStatefulView{
 
-  #sortMap = null;
   #onsortTypeChange = null;
-  #SortType = null;
 
   constructor({onSortTypeChange, currentSortType}){
     super();
 
-    this.#sortMap = Object.values(SortType)
-      .map((type) => ({
-        type,
-        isChecked: (type === currentSortType),
-        isDisabled: (!enabledSortType[type])
-      }));
-
+    this._setState({
+      sortType : currentSortType
+    });
 
     this.#onsortTypeChange = onSortTypeChange;
-    this.#SortType = SortType;
-    this.element.addEventListener('click', this.#sortTypeChangeHandler);
 
+    this._restoreHandlers();
+
+  }
+
+  _restoreHandlers() {
+    this.element.addEventListener('change', this.#sortTypeChangeHandler);
   }
 
   get template() {
-    return createSortTemplate({sortMap: this.#sortMap});
+    return createSortTemplate(this._state);
   }
 
   #sortTypeChangeHandler = (evt) => {
-    if(evt.target.closest('.trip-sort__input')){
+    const eventSortType = evt.target.dataset.sortType;
+
+
+    if(eventSortType){
       evt.preventDefault();
-      this.#onsortTypeChange(evt.target.dataset['sortType']);
-      // console.log(SortType[(evt.target.dataset['sortType']).toUpperCase()]);
+      this.#onsortTypeChange(eventSortType);
     }
   };
 }

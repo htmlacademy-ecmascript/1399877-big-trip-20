@@ -1,24 +1,41 @@
 import FilterView from '../view/filters-view.js';
-
-import { generateFilters } from '../model/filter.js';
-import { render } from '../framework/render.js';
-
-
+import { filter } from '../utils/filter.js';
+import { render, remove } from '../framework/render.js';
+import { UpdateType, FilterType } from '../const.js';
 export default class FilterPresenter{
 
-  #pointModel = null;
-  #filterConteiner = null;
-  #filters = [];
+  #filterComponent = null;
+  #filterModel = null;
 
-  constructor (pointModel,filterConteiner){
-    this.#pointModel = pointModel;
-    this.#filterConteiner = filterConteiner;
+  constructor ({filterConteiner, filterModel}){
+    this.#filterModel = filterModel;
 
-    this.#filters = generateFilters(this.#pointModel.get());
+    this.#filterComponent = new FilterView({
+      currentFilterType : this.#filterModel.filter,
+      onFilterChange : this.#filterTypeChangeHandler
+    });
+
+    render(this.#filterComponent, filterConteiner);
+  }
+
+  filterePoints(points) {
+    return filter[this.#filterModel.filter](points);
   }
 
   init(){
-    render(new FilterView(this.#filters), this.#filterConteiner);
+    this.#filterComponent.updateElement({
+      currentFilterType : this.#filterModel.filter,
+    });
+  }
+
+  #filterTypeChangeHandler = (filterType) => {
+    if(!this.#filterModel.filter !== FilterType) {
+      this.#filterModel.setFilter(UpdateType.MAJOR, filterType);
+    }
+  };
+
+  destroy() {
+    remove(this.#filterComponent);
   }
 
 }

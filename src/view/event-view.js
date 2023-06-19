@@ -1,11 +1,22 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import {formatStringToShortDate,formatStringShorTime, callcDate} from '../utils/point.js';
+import {formatDuration, getDuration} from '../utils/common.js';
+import dayjs from 'dayjs';
 
 
 function createEventsItemViewTemplate(data){
   const {point, destination, offers} = data;
+
+  const startDay = dayjs(point.dateFrom).format('MMM D');
+  const startDayDateTime = dayjs(point.dateFrom).format('YYYY-MM-DD');
+  const startTime = dayjs(point.dateFrom).format('HH:mm');
+  const startTimeDateTime = dayjs(point.dateFrom).format('YYYY-MM-DDTHH:mm');
+  const endTime = dayjs(point.dateTo).format('HH:mm');
+  const endTimeDateTime = dayjs(point.dateTo).format('YYYY-MM-DDTHH:mm');
+
+  const eventDuration = formatDuration(getDuration(point.dateFrom, point.dateTo));
+
   const offersItemsList = offers?.offers?.map((offer) => `
-<li class="event__offer">
+      <li class="event__offer">
         <span class="event__offer-title">${point.offers?.some((offerId) => offerId === offer.id) ? offer.title : ''}</span>
         ${point.offers?.some((offerId) => offerId === offer.id) ? ' &plus; &euro;&nbsp;' : ''}
         <span class="event__offer-price">${point.offers?.some((offerId) => offerId === offer.id) ? offer.price : ''}</span>
@@ -13,18 +24,18 @@ function createEventsItemViewTemplate(data){
 `).join('');
   return(`            <li class="trip-events__item">
   <div class="event">
-    <time class="event__date" datetime="${point.dateFrom}">${formatStringToShortDate(point.dateFrom)}</time>
+    <time class="event__date" datetime="${startDayDateTime}">${startDay}</time>
     <div class="event__type">
     <img class="event__type-icon" width="42" height="42" src="img/icons/${point.type}.png" alt="Event type icon">
     </div>
     <h3 class="event__title">${point.type} ${destination.name}</h3>
     <div class="event__schedule">
       <p class="event__time">
-        <time class="event__start-time" datetime="${point.dateFrom}">${formatStringShorTime(point.dateFrom)}</time>
+      <time class="event__start-time" datetime="${startTimeDateTime}">${startTime}</time>
         &mdash;
-        <time class="event__end-time" ${point.dateFrom}">${formatStringShorTime(point.dateTo)}</time>
+        <time class="event__end-time" datetime="${endTimeDateTime}">${endTime}</time>
       </p>
-      <p class="event__duration">${callcDate(point.dateFrom ,point.dateTo)}</p>
+      <p class="event__duration">${eventDuration}</p>
     </div>
     <p class="event__price">
       &euro;&nbsp;<span class="event__price-value">${point.basePrice}</span>
