@@ -1,4 +1,4 @@
-import { render, remove} from '../framework/render.js';
+import { render, remove, RenderPosition} from '../framework/render.js';
 import ListEmpty from '../view/list-empty.js';
 import PointPresenter from './point-presenter.js';
 import SortPresenter from './sort-presenter.js';
@@ -9,11 +9,13 @@ import NewPointPresenter from './new-point-presenter.js';
 import FilterPresenter from './filter-presenter.js';
 import FilterModel from '../model/filter-model.js';
 import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
+import LoadingView from '../view/loading-view.js';
 import { TimeLimit } from '../const.js';
 
 
 export default class EventPresenter {
   #eventsListView = new EventsListView();
+  #loadingView = new LoadingView();
   #emptyListView = null;
   #listContainer = null;
   #filterConteiner = null;
@@ -144,11 +146,16 @@ export default class EventPresenter {
         break;
       case UpdateType.INIT :
         this.#isLoading = false;
+        remove(this.#loadingView);
         this.#clearPoints();
         this.init();
         break;
     }
   };
+
+  #renderLoading() {
+    render(this.#loadingView, this.#eventsListView.element, RenderPosition.AFTERBEGIN);
+  }
 
   #handleModeChange = () => {
     this.#newPointPresenter.destroy();
@@ -217,13 +224,17 @@ export default class EventPresenter {
   }
 
   init() {
+    render(this.#eventsListView, this.#listContainer);
+    if (this.#isLoading) {
+      this.#renderLoading();
+      return;
+    }
     this.#filtersPresenter.init();
     const points = [...this.points];
     this.#clearEmptyList();
 
     if(points.length) {
       this.#sortPresenter.init();
-      render(this.#eventsListView, this.#listContainer);
       points.forEach((point) => this.#renderPoint(point));
     } else {
       this.#renderEmptyList();
