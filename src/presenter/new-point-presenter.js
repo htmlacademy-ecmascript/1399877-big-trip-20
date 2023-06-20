@@ -31,8 +31,8 @@ export default class NewPointPresenter {
     this.#pointEditComponent = new EventEdit({
       destinations : this.#destinationsModel.destinations,
       offers : this.#offersModel.offers,
-      onEditFormSubmit : this.#editFormSubmit,
-      onEditFormDelete : this.#editFormDelete,
+      onSave : this.#editFormSubmit,
+      handelCansel : this.#editFormDelete,
       isNew : true,
     });
 
