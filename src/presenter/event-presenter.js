@@ -100,7 +100,6 @@ export default class EventPresenter {
 
   #handelViewAction = async (actionType, updateType, update) => {
     this.#uiBlocker.block();
-
     switch (actionType) {
       case UserAction.UPDATE_POINT:
         this.#pointPresenters.get(update.id).setSaving();
@@ -119,11 +118,11 @@ export default class EventPresenter {
         }
         break;
       case UserAction.DELETE_POINT:
-        this.#pointPresenters.get(update.point.id).setDeleting();
+        this.#pointPresenters.get(update.id).setDeleting();
         try {
-          await this.#pointsModel.deletePoint(updateType, update.point);
+          await this.#pointsModel.deletePoint(updateType, update);
         } catch(err) {
-          this.#pointPresenters.get(update.point.id).setAborting();
+          this.#pointPresenters.get(update.id).setAborting();
         }
         break;
     }

@@ -23,7 +23,6 @@ export default class PointsApiService extends ApiService {
       headers : new Headers({'Content-Type' : 'application/json'}),
     });
     const parsedResponse = await ApiService.parseResponse(response);
-    console.log(parsedResponse)
     return parsedResponse;
   }
 
@@ -50,8 +49,8 @@ export default class PointsApiService extends ApiService {
     const adaptedPoint = {
       ...point,
       'base_price': point.basePrice,
-      'date_from': point.dateFrom instanceof Date ? point.dateFrom.toISOString() : null,
-      'date_to': point.dateTo instanceof Date ? point.dateTo.toISOString() : null,
+      'date_from': point.dateFrom instanceof Date ? point.dateFrom.toISOString() : point.dateFrom,
+      'date_to': point.dateTo instanceof Date ? point.dateTo.toISOString() : point.dateTo,
       'is_favorite': point.isFavorite,
     };
 
