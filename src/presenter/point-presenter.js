@@ -1,5 +1,5 @@
 import { render, replace, remove } from '../framework/render.js';
-import EventsView from '../view/event-view.js';
+import EventView from '../view/event-view.js';
 import EventEdit from '../view/event-edit.js';
 import {UpdateType, UserAction} from '../const.js';
 import {PointMode} from '../const.js';
@@ -35,7 +35,7 @@ export default class PointPresenter{
 
 
   #createViewModeComponent(point) {
-    const pointView = new EventsView({
+    const pointView = new EventView({
       point,
       destination : this.#destinationsModel.getById(point.destination),
       offers : this.#offersModel.getByType(point.type),
@@ -107,14 +107,15 @@ export default class PointPresenter{
   };
 
   resetView() {
-    if (this.#mode !== this.#mode.VIEW) {
+    if (this.#mode !== PointMode.VIEW) {
       this.#createEditModeComponent.reset(this.#pointData);
       this.#renderEditMode();
     }
   }
 
   setSaving() {
-    if (this.#mode === this.#mode.EDITING) {
+    if (this.#mode === PointMode.EDIT) {
+
       this.#pointEditComponent.updateElement({
         isDisabled: true,
         isSaving: true
@@ -123,7 +124,7 @@ export default class PointPresenter{
   }
 
   setDeleting() {
-    if (this.#mode === this.#mode.EDITING){
+    if (this.#mode === PointMode.EDIT){
       this.#pointEditComponent.updateElement({
         isDisabled: true,
         isDeleting: true
@@ -132,7 +133,7 @@ export default class PointPresenter{
   }
 
   setAborting() {
-    if (this.#mode === this.#mode.VIEW) {
+    if (this.#mode === PointMode.VIEW) {
       this.#pointViewComponent.shake();
       return;
     }

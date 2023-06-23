@@ -63,7 +63,7 @@ const createDestinationTemplate = (destinationItem) => {
     return '';
   }
 
-  return (/*html*/`
+  return (`
     <section class="event__section  event__section--destination">
       <h3 class="event__section-title  event__section-title--destination">Destination</h3>
       <p class="event__destination-description">${destinationItem.description}</p>
@@ -234,7 +234,7 @@ export default class EventEdit extends AbstractStatefulView {
     this.#handelSave(EventEdit.parseStateToPoint(this._state));
   };
 
-  #onCancelButtonClick = (evt) => {
+  #FormCancelButtonClick = (evt) => {
     evt.preventDefault();
     this.#handelCansel();
   };
@@ -296,7 +296,7 @@ export default class EventEdit extends AbstractStatefulView {
     } else {
       this.element.querySelector('.event__reset-btn').addEventListener('click', this.#formDeleteClickHandler);
 
-      this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#onCancelButtonClick);
+      this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#FormCancelButtonClick);
     }
 
     this.element.querySelector('.event__type-group').addEventListener('change', this.#typeChangeHandler);
@@ -353,7 +353,6 @@ export default class EventEdit extends AbstractStatefulView {
       {
         enableTime: true,
         dateFormat: 'd/m/y H:i',
-        minDate: 'today',
         defaultDate: this._state.point.dateFrom,
         onChange: this.#dateFromChangeHandler,
         'time_24hr': true,

@@ -43,7 +43,6 @@ export default class EventPresenter {
     upperLimit: TimeLimit.UPPER_LIMIT
   });
 
-  #onNewPointDestroy = null;
 
   constructor({listContainer, pointsModel, offersModel, destinationsModel, filterConteiner, onNewPointDestroy}){
     this.#listContainer = listContainer;
@@ -59,7 +58,6 @@ export default class EventPresenter {
     this.#sortModel.addObserver(this.#handelModelEvent);
     this.#filterModel.addObserver(this.#handelModelEvent);
 
-    this.#onNewPointDestroy = onNewPointDestroy;
 
     this.#sortPresenter = new SortPresenter({
       listContainer,
