@@ -84,6 +84,8 @@ const TimeLimit = {
   UPPER_LIMIT: 1000
 };
 
+const MAX_CITIES_COUNT = 3;
+
 export {
   TYPES,
   FilterType,
@@ -95,5 +97,6 @@ export {
   Method,
   DateFormat,
   BLANK_POINT,
-  TimeLimit
+  TimeLimit,
+  MAX_CITIES_COUNT
 };

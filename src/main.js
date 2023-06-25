@@ -1,5 +1,4 @@
-import {render, RenderPosition} from './framework/render.js';
-import InfoView from './view/info-view.js';
+import {render} from './framework/render.js';
 import NewPointButtonView from './view/new-point-button-view.js';
 import EventPresenter from './presenter/event-presenter.js';
 import PointModel from './model/point-model.js';
@@ -28,7 +27,8 @@ const eventPresenter = new EventPresenter({
   offersModel: offersModel,
   destinationsModel: destinationsModel,
   filterConteiner : filterConteiner,
-  onNewPointDestroy: handleNewPointFormClose
+  onNewPointDestroy: handleNewPointFormClose,
+  infoViewContainer : mainContainer
 });
 
 const newPointButtonComponent = new NewPointButtonView({
@@ -44,7 +44,7 @@ function handleNewPointButtonClick(){
   eventPresenter.createPoint();
 }
 
-render(new InfoView(), mainContainer, RenderPosition.AFTERBEGIN);
+// render(new InfoView(), mainContainer, RenderPosition.AFTERBEGIN);
 
 eventPresenter.init();
 pointsModel.init()
