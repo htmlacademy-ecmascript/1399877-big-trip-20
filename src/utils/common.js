@@ -18,6 +18,17 @@ const formatDuration = (durationValue) => {
   return durationValue.format(DateFormat.M_DURATION);
 };
 
+function calculatePointDueDate(dueDate, dateFormat) {
+  return dueDate ? dayjs(dueDate).format(dateFormat) : '';
+}
+
+function sortByDate(points) {
+  return points.sort((a, b) => {
+    const dateDiff = dayjs(a.dateFrom).unix() - dayjs(b.dateFrom).unix();
+    return dateDiff;
+  });
+}
+
 const escBehavior = (callback) => {
   const handler = (evt) => {
     if (evt.key === 'Escape') {
@@ -57,5 +68,7 @@ export {
   isDateFuture,
   isDatePast,
   isDatePresent,
-  escBehavior
+  escBehavior,
+  calculatePointDueDate,
+  sortByDate
 };

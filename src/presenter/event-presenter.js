@@ -1,4 +1,4 @@
-import { render, remove, RenderPosition} from '../framework/render.js';
+import { render, replace, remove, RenderPosition} from '../framework/render.js';
 import ListEmpty from '../view/list-empty.js';
 import PointPresenter from './point-presenter.js';
 import SortPresenter from './sort-presenter.js';
@@ -11,14 +11,19 @@ import FilterModel from '../model/filter-model.js';
 import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 import LoadingView from '../view/loading-view.js';
 import { TimeLimit } from '../const.js';
+import InfoView from '../view/info-view.js';
+import { sortByDate } from '../utils/common.js';
 
 
 export default class EventPresenter {
   #eventsListView = new EventsListView();
   #loadingView = new LoadingView();
+  #infoViewComponent = null;
+
   #emptyListView = null;
   #listContainer = null;
   #filterConteiner = null;
+  #infoViewContainer = null;
   /**
 	* Список всех презентеров точек
 	* @type {Map<string, PointPresenter>}
@@ -45,9 +50,10 @@ export default class EventPresenter {
   });
 
 
-  constructor({listContainer, pointsModel, offersModel, destinationsModel, filterConteiner, onNewPointDestroy}){
+  constructor({listContainer, pointsModel, offersModel, destinationsModel, filterConteiner, onNewPointDestroy, infoViewContainer}){
     this.#listContainer = listContainer;
     this.#filterConteiner = filterConteiner;
+    this.#infoViewContainer = infoViewContainer;
 
     this.#pointsModel = pointsModel;
     this.#offersModel = offersModel;
@@ -86,7 +92,26 @@ export default class EventPresenter {
     this.#currentSortType = SortType.DAY;
     this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
     this.#newPointPresenter.init({destinations: this.destinations, offers: this.offers});
+  }
 
+  #renderInfoView(){
+    const shortPoints = sortByDate(this.#pointsModel.points).map((point) => this.#destinationsModel.getById(point.destination)?.name);
+    const prevTripInfoComponent = this.#infoViewComponent;
+
+    this.#infoViewComponent = new InfoView({
+      destinationsModel: this.#destinationsModel.destinations,
+      pointsModel: this.#pointsModel.points,
+      offersModel: this.#offersModel.offers,
+      shortPoints : shortPoints
+    });
+
+    if(prevTripInfoComponent === null) {
+      render(this.#infoViewComponent, this.#infoViewContainer, RenderPosition.AFTERBEGIN);
+      return;
+    }
+
+    replace(this.#infoViewComponent, prevTripInfoComponent);
+    remove(prevTripInfoComponent);
   }
 
   #createFiltersPresenter(){
@@ -143,7 +168,6 @@ export default class EventPresenter {
         this.init();
         break;
       case UpdateType.INIT :
-
         if(point.isError) {
           this.#isError = true;
         } else {
@@ -237,12 +261,15 @@ export default class EventPresenter {
       render(this.#emptyListView, this.#listContainer);
       return;
     }
-
     this.#filtersPresenter.init();
     const points = [...this.points];
     this.#clearEmptyList();
 
     if(points.length) {
+      if(points.length >= 2) {
+        this.#renderInfoView();
+
+      }
       this.#sortPresenter.init();
       points.forEach((point) => this.#renderPoint(point));
     } else {

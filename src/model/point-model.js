@@ -103,8 +103,4 @@ export default class PointModel extends Observable{
 
     return adaptedPoint;
   }
-
-  getCitiesNames = () => this.#destinationsModel.map((destination) => destination.name);
-
-  getEventsTypes = () => this.#offersModel.map((offer) => offer.type);
 }
