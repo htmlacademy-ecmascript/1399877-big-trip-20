@@ -1,8 +1,8 @@
 import { render, replace, remove } from '../framework/render.js';
-import EventsView from '../view/event-view.js';
+import EventView from '../view/event-view.js';
 import EventEdit from '../view/event-edit.js';
-import {UpdateType, UserAction} from '../const.js';
-import {PointMode} from '../const.js';
+import {UpdateType, UserAction, PointMode} from '../const.js';
+import { escBehavior } from '../utils/common.js';
 
 export default class PointPresenter{
 
@@ -15,12 +15,15 @@ export default class PointPresenter{
   #handleEditModeChange = null;
   #handleDataChange = null;
   #mode = PointMode.VIEW;
+  #escControl = null;
 
   constructor({eventsListView, offersModel, destinationsModel, onDataChange}) {
     this.#eventsListView = eventsListView;
     this.#offersModel = offersModel;
     this.#destinationsModel = destinationsModel;
     this.#handleDataChange = onDataChange;
+
+    this.#escControl = escBehavior(this.closeEditMode);
   }
 
 
@@ -30,12 +33,12 @@ export default class PointPresenter{
       UpdateType.MINOR,
       point,
     );
-    document.removeEventListener('keydown', this.escKeyDownHandler);
+    this.#escControl.remove();
   };
 
 
   #createViewModeComponent(point) {
-    const pointView = new EventsView({
+    const pointView = new EventView({
       point,
       destination : this.#destinationsModel.getById(point.destination),
       offers : this.#offersModel.getByType(point.type),
@@ -91,7 +94,7 @@ export default class PointPresenter{
     if(this.#mode === PointMode.VIEW){
       this.#renderEditMode();
       this.#handleEditModeChange?.();
-      document.addEventListener('keydown', this.escKeyDownHandler);
+      this.#escControl.add();
     }
   };
 
@@ -102,19 +105,20 @@ export default class PointPresenter{
   closeEditMode = () => {
     if(this.#mode === PointMode.EDIT){
       this.#renderViewMode();
-      document.removeEventListener('keydown', this.escKeyDownHandler);
+      this.#escControl.remove();
     }
   };
 
   resetView() {
-    if (this.#mode !== this.#mode.VIEW) {
+    if (this.#mode !== PointMode.VIEW) {
       this.#createEditModeComponent.reset(this.#pointData);
       this.#renderEditMode();
     }
   }
 
   setSaving() {
-    if (this.#mode === this.#mode.EDITING) {
+    if (this.#mode === PointMode.EDIT) {
+
       this.#pointEditComponent.updateElement({
         isDisabled: true,
         isSaving: true
@@ -123,7 +127,7 @@ export default class PointPresenter{
   }
 
   setDeleting() {
-    if (this.#mode === this.#mode.EDITING){
+    if (this.#mode === PointMode.EDIT){
       this.#pointEditComponent.updateElement({
         isDisabled: true,
         isDeleting: true
@@ -132,7 +136,7 @@ export default class PointPresenter{
   }
 
   setAborting() {
-    if (this.#mode === this.#mode.VIEW) {
+    if (this.#mode === PointMode.VIEW) {
       this.#pointViewComponent.shake();
       return;
     }
@@ -148,13 +152,6 @@ export default class PointPresenter{
     this.#pointEditComponent.shake(resetFormState);
   }
 
-
-  escKeyDownHandler = (evt) => {
-    if(evt.key === 'Escape'){
-      evt.preventDefault();
-      this.closeEditMode();
-    }
-  };
 
   changeFavorite = () => {
     this.#handleDataChange(
@@ -176,8 +173,6 @@ export default class PointPresenter{
       UserAction.UPDATE_POINT,
       UpdateType.MINOR,
       {...this.#pointData});
-
-    this.#renderViewMode();
   };
 
   init(pointData) {

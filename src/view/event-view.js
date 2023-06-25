@@ -57,7 +57,7 @@ function createEventsItemViewTemplate(data){
 </li>`);
 }
 
-export default class EventsView extends AbstractView{
+export default class EventView extends AbstractView{
 
   #destination;
   #offers;

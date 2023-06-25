@@ -1,10 +1,10 @@
 import {render, RenderPosition} from './framework/render.js';
-import InfoView from './view/main-info-view.js';
+import InfoView from './view/info-view.js';
 import NewPointButtonView from './view/new-point-button-view.js';
 import EventPresenter from './presenter/event-presenter.js';
 import PointModel from './model/point-model.js';
 import OfferModel from './model/offer-model.js';
-import DestinationsModel from './model/destination-model.js';
+import DestinationModel from './model/destination-model.js';
 import PointsApiService from './service/points-api-service.js';
 
 const AUTHORIZATION = 'Basic ao7k590it12345z';
@@ -15,7 +15,7 @@ const mainContainer = document.querySelector('.trip-main');
 
 const pointsApiService = new PointsApiService(END_POINT, AUTHORIZATION);
 const offersModel = new OfferModel(pointsApiService);
-const destinationsModel = new DestinationsModel(pointsApiService);
+const destinationsModel = new DestinationModel(pointsApiService);
 const pointsModel = new PointModel({
   service : pointsApiService,
   offersModel,
