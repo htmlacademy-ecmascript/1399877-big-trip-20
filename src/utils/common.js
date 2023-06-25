@@ -18,6 +18,20 @@ const formatDuration = (durationValue) => {
   return durationValue.format(DateFormat.M_DURATION);
 };
 
+const escBehavior = (callback) => {
+  const handler = (evt) => {
+    if (evt.key === 'Escape') {
+      evt.preventDefault();
+      callback();
+    }
+  };
+
+  return {
+    add : () => document.addEventListener('keydown', handler),
+    remove : () => document.removeEventListener('keydown', handler)
+  };
+};
+
 function getRandomInteger(a = 0, b = 1){
   const lower = Math.ceil(Math.min(a, b));
   const upper = Math.floor(Math.max(a,b));
@@ -42,5 +56,6 @@ export {
   getRandomValue,
   isDateFuture,
   isDatePast,
-  isDatePresent
+  isDatePresent,
+  escBehavior
 };

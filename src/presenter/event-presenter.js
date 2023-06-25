@@ -37,6 +37,7 @@ export default class EventPresenter {
 
   #currentSortType = SortType.DAY;
   #isLoading = true;
+  #isError = false;
 
   #uiBlocker = new UiBlocker({
     lowerLimit: TimeLimit.LOWER_LIMIT,
@@ -142,6 +143,12 @@ export default class EventPresenter {
         this.init();
         break;
       case UpdateType.INIT :
+
+        if(point.isError) {
+          this.#isError = true;
+        } else {
+          this.#isError = false;
+        }
         this.#isLoading = false;
         remove(this.#loadingView);
         this.#clearPoints();
@@ -179,8 +186,6 @@ export default class EventPresenter {
     });
 
     this.#pointPresenters.set(point.id, this.#pointPresenter);
-
-    document.addEventListener('keydown', this.#pointPresenter.escKeyDownHandler);
   }
 
   #clearPoints = (resetSortType = false) => {
@@ -226,6 +231,13 @@ export default class EventPresenter {
       this.#renderLoading();
       return;
     }
+    if(this.#isError) {
+      const text = 'Oops...Something getting wrong';
+      this.#emptyListView = new ListEmpty({text});
+      render(this.#emptyListView, this.#listContainer);
+      return;
+    }
+
     this.#filtersPresenter.init();
     const points = [...this.points];
     this.#clearEmptyList();

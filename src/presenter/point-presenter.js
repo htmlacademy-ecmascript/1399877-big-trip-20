@@ -1,8 +1,8 @@
 import { render, replace, remove } from '../framework/render.js';
 import EventView from '../view/event-view.js';
 import EventEdit from '../view/event-edit.js';
-import {UpdateType, UserAction} from '../const.js';
-import {PointMode} from '../const.js';
+import {UpdateType, UserAction, PointMode} from '../const.js';
+import { escBehavior } from '../utils/common.js';
 
 export default class PointPresenter{
 
@@ -15,12 +15,15 @@ export default class PointPresenter{
   #handleEditModeChange = null;
   #handleDataChange = null;
   #mode = PointMode.VIEW;
+  #escControl = null;
 
   constructor({eventsListView, offersModel, destinationsModel, onDataChange}) {
     this.#eventsListView = eventsListView;
     this.#offersModel = offersModel;
     this.#destinationsModel = destinationsModel;
     this.#handleDataChange = onDataChange;
+
+    this.#escControl = escBehavior(this.closeEditMode);
   }
 
 
@@ -30,7 +33,7 @@ export default class PointPresenter{
       UpdateType.MINOR,
       point,
     );
-    document.removeEventListener('keydown', this.escKeyDownHandler);
+    this.#escControl.remove();
   };
 
 
@@ -91,7 +94,7 @@ export default class PointPresenter{
     if(this.#mode === PointMode.VIEW){
       this.#renderEditMode();
       this.#handleEditModeChange?.();
-      document.addEventListener('keydown', this.escKeyDownHandler);
+      this.#escControl.add();
     }
   };
 
@@ -102,7 +105,7 @@ export default class PointPresenter{
   closeEditMode = () => {
     if(this.#mode === PointMode.EDIT){
       this.#renderViewMode();
-      document.removeEventListener('keydown', this.escKeyDownHandler);
+      this.#escControl.remove();
     }
   };
 
@@ -150,13 +153,6 @@ export default class PointPresenter{
   }
 
 
-  escKeyDownHandler = (evt) => {
-    if(evt.key === 'Escape'){
-      evt.preventDefault();
-      this.closeEditMode();
-    }
-  };
-
   changeFavorite = () => {
     this.#handleDataChange(
       UserAction.UPDATE_POINT,
@@ -177,8 +173,6 @@ export default class PointPresenter{
       UserAction.UPDATE_POINT,
       UpdateType.MINOR,
       {...this.#pointData});
-
-    this.#renderViewMode();
   };
 
   init(pointData) {

@@ -2,6 +2,7 @@ import { UpdateType, UserAction } from '../const.js';
 import { RenderPosition } from '../framework/render.js';
 import EventEdit from '../view/event-edit.js';
 import { render, remove } from '../framework/render.js';
+import { escBehavior } from '../utils/common.js';
 
 export default class NewPointPresenter {
   #pointListContainer = null;
@@ -11,6 +12,7 @@ export default class NewPointPresenter {
   #offersModel = null;
 
   #pointEditComponent = null;
+  #escControl = null;
 
   constructor({pointListContainer, offersModel, destinationsModel, onPointChange, onDestroy}) {
     this.#pointListContainer = pointListContainer;
@@ -20,7 +22,7 @@ export default class NewPointPresenter {
 
     this.#handlePointChange = onPointChange;
     this.#handleDestroy = onDestroy;
-
+    this.#escControl = escBehavior(() => this.destroy());
   }
 
   init() {
@@ -37,8 +39,7 @@ export default class NewPointPresenter {
     });
 
     render(this.#pointEditComponent, this.#pointListContainer, RenderPosition.AFTERBEGIN);
-
-    document.addEventListener('keydown', this.#escKeyDownHandler);
+    this.#escControl.add();
   }
 
   destroy() {
@@ -51,7 +52,7 @@ export default class NewPointPresenter {
     remove(this.#pointEditComponent);
     this.#pointEditComponent = null;
 
-    document.removeEventListener('keydown', this.#escKeyDownHandler);
+    this.#escControl.remove();
   }
 
   setSaving(){
@@ -83,12 +84,5 @@ export default class NewPointPresenter {
 
   #editFormDelete = () => {
     this.destroy();
-  };
-
-  #escKeyDownHandler = (evt) => {
-    if (evt.key === 'Escape' || evt.key === 'Esc') {
-      evt.preventDefault();
-      this.destroy();
-    }
   };
 }
