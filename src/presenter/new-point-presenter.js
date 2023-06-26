@@ -2,7 +2,7 @@ import { UpdateType, UserAction } from '../const.js';
 import { RenderPosition } from '../framework/render.js';
 import EventEdit from '../view/event-edit.js';
 import { render, remove } from '../framework/render.js';
-import { escBehavior } from '../utils/common.js';
+import { getEscHandlers } from '../utils/common.js';
 
 export default class NewPointPresenter {
   #pointListContainer = null;
@@ -22,7 +22,7 @@ export default class NewPointPresenter {
 
     this.#handlePointChange = onPointChange;
     this.#handleDestroy = onDestroy;
-    this.#escControl = escBehavior(() => this.destroy());
+    this.#escControl = getEscHandlers(() => this.destroy());
   }
 
   init() {

@@ -29,7 +29,7 @@ function sortByDate(points) {
   });
 }
 
-const escBehavior = (callback) => {
+const getEscHandlers = (callback) => {
   const handler = (evt) => {
     if (evt.key === 'Escape') {
       evt.preventDefault();
@@ -68,7 +68,7 @@ export {
   isDateFuture,
   isDatePast,
   isDatePresent,
-  escBehavior,
+  getEscHandlers,
   calculatePointDueDate,
   sortByDate
 };

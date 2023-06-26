@@ -3,7 +3,7 @@ import ListEmpty from '../view/list-empty.js';
 import PointPresenter from './point-presenter.js';
 import SortPresenter from './sort-presenter.js';
 import EventsListView from '../view/events-list-view.js';
-import { UserAction, UpdateType, SortType, FilterType } from '../const.js';
+import { UserAction, UpdateType, FilterType } from '../const.js';
 import SortModel from '../model/sortModel.js';
 import NewPointPresenter from './new-point-presenter.js';
 import FilterPresenter from './filter-presenter.js';
@@ -40,7 +40,6 @@ export default class EventPresenter {
   #sortModel = null;
   #filterModel = null;
 
-  #currentSortType = SortType.DAY;
   #isLoading = true;
   #isError = false;
 
@@ -89,7 +88,6 @@ export default class EventPresenter {
   }
 
   createPoint(){
-    this.#currentSortType = SortType.DAY;
     this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
     this.#newPointPresenter.init({destinations: this.destinations, offers: this.offers});
   }
@@ -205,6 +203,7 @@ export default class EventPresenter {
       this.#pointPresenters.forEach((presenter, pointId) => {
         if (point.id !== pointId) {
           presenter.closeEditMode();
+          this.#newPointPresenter.destroy();
         }
       });
     });
@@ -218,7 +217,6 @@ export default class EventPresenter {
       presenter.destroy();
     });
     this.#pointPresenters.clear();
-
     if(resetSortType) {
       this.#sortModel.resetType();
     }

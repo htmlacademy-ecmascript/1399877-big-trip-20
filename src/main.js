@@ -44,8 +44,6 @@ function handleNewPointButtonClick(){
   eventPresenter.createPoint();
 }
 
-// render(new InfoView(), mainContainer, RenderPosition.AFTERBEGIN);
-
 eventPresenter.init();
 pointsModel.init()
   .finally(() => {
