@@ -2,7 +2,7 @@ import { render, replace, remove } from '../framework/render.js';
 import EventView from '../view/event-view.js';
 import EventEdit from '../view/event-edit.js';
 import {UpdateType, UserAction, PointMode} from '../const.js';
-import { escBehavior } from '../utils/common.js';
+import { getEscHandlers } from '../utils/common.js';
 
 export default class PointPresenter{
 
@@ -23,7 +23,7 @@ export default class PointPresenter{
     this.#destinationsModel = destinationsModel;
     this.#handleDataChange = onDataChange;
 
-    this.#escControl = escBehavior(this.closeEditMode);
+    this.#escControl = getEscHandlers(this.closeEditMode);
   }
 
 
